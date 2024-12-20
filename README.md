@@ -68,13 +68,15 @@ Avant de commencer, assurez-vous que votre environnement dispose des éléments 
 
 1. **Cloner le dépôt** :  
    
-bash
+```bash
    git clone https://github.com/votre-utilisateur/syncspace-server.git
    cd syncspace-server
+```
 
 2. **Installer les dépendances Symfony** :
-bash
+```bash
    composer install
+```
 
 3. **Configurer la base de données** :  
    Ouvrez le fichier .env situé à la racine du projet et modifiez la variable DATABASE_URL avec vos informations de base de données (utilisateur, mot de passe, etc.).
@@ -82,12 +84,14 @@ bash
 
 4. **Créer la base de données** :  
    
-bash
+```bash
    php bin/console doctrine:database:create
+```
 
 5. **Appliquer les migrations** :
-bash
+```bash
    php bin/console doctrine:migrations:migrate
+```
 
 6. **Générer les clés JWT** :  
    Créez les clés nécessaires pour l'authentification JWT en exécutant les commandes suivantes dans votre terminal. Ces clés seront utilisées pour sécuriser les échanges d’informations entre le frontend et le backend.
@@ -101,12 +105,14 @@ Pour démarrer le serveur localement :
 
 1. Si vous utilisez **PHP intégré** :
    
-bash
+```bash
    php bin/console server:run
+```
 
 2. Si vous utilisez **Docker** :
-bash
+```bash
    docker compose up --build
+```
 
 L’API sera accessible à l’adresse suivante : http://localhost:8000
 
@@ -144,8 +150,10 @@ L’API est documentée sur une page accessible gratuitement. Une interface inte
 1. Forkez le projet.  
 2. Créez une branche pour vos modifications :
    
-bash
+```bash
    git checkout -b [module]:feature/nouvelle-fonctionnalite
+```
+
 3. Soumettez une pull request après validation de vos changements.
 
 ---
