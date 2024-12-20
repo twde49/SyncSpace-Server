@@ -1,20 +1,83 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1>API Documentation</h1>
+            <nav>
+                <ul>
+                    <li><a href="#get-started">Get Started</a></li>
+                    <li><a href="#auth">Authentication</a></li>
+                    <li><a href="#endpoints">Endpoints</a></li>
+                </ul>
+            </nav>
+        </aside>
 
-{% block title %}Hello DocController!{% endblock %}
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Header -->
+            <header>
+                <h2>Welcome to the API Documentation</h2>
+                <p>Your one-stop guide to integrating with our API.</p>
+            </header>
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+            <!-- Sections -->
+            <section id="get-started">
+                <h3>Getting Started</h3>
+                <p>Follow these steps to start using our API quickly.</p>
+            </section>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+            <section id="auth">
+                <h3>Authentication</h3>
+                <p>All endpoints require authentication. Include the following headers:</p>
+                <pre class="json-block">{
+    "Authorization": "Bearer YOUR_API_KEY"
+}</pre>
+            </section>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/ttst/Documents/symfonyProjects/SyncSpace/src/Controller/DocController.php</code></li>
-        <li>Your template at <code>/Users/ttst/Documents/symfonyProjects/SyncSpace/templates/doc/index.html.twig</code></li>
-    </ul>
-</div>
-{% endblock %}
+            <section id="endpoints">
+                <h3>Endpoints</h3>
+
+                <!-- GET Endpoint -->
+                <div class="endpoint get">
+                    <strong>GET</strong> /api/v1/resource
+                    <p>Retrieve a list of resources.</p>
+                </div>
+
+                <!-- POST Endpoint -->
+                <div class="endpoint post">
+                    <strong>POST</strong> /api/v1/resource
+                    <p>Create a new resource. Example body:</p>
+                    <pre class="json-block">{
+    "name": "Resource Name",
+    "description": "Resource Description"
+}</pre>
+                </div>
+
+                <!-- PUT Endpoint -->
+                <div class="endpoint put">
+                    <strong>PUT</strong> /api/v1/resource/:id
+                    <p>Update an existing resource. Example body:</p>
+                    <pre class="json-block">{
+    "name": "Updated Resource Name",
+    "description": "Updated Resource Description"
+}</pre>
+                </div>
+
+                <!-- DELETE Endpoint -->
+                <div class="endpoint delete">
+                    <strong>DELETE</strong> /api/v1/resource/:id
+                    <p>Delete a resource by its ID.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
