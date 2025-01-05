@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -40,5 +41,28 @@ class RegistrationController extends AbstractController
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form,
         ]);
+    }
+    
+    #[Route('/api/register', methods: "POST")]
+    public function registerApi(SerializerInterface $serializer,Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $manager): Response
+    {
+
+        $user = $serializer->deserialize($request->getContent(), User::class, "json");
+
+        $parameters = json_decode($request->getContent(), true);
+
+        $user->setPassword(
+            $userPasswordHasher->hashPassword(
+                $user,
+                $parameters["password"]
+            )
+        );
+
+
+        $manager->persist($user);
+        $manager->flush();
+
+        return $this->json("L'utilisateur a bien été créé", 200, [], ["groups" => "forCreation"]);
+
     }
 }
