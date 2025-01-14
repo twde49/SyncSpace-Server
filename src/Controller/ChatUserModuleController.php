@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Conversation;
 use App\Entity\Message;
 use App\Repository\UserRepository;
+use App\Service\ConversationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,10 +16,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class ChatUserModuleController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private ConversationService $conversationService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ConversationService $conversationService)
     {
         $this->entityManager = $entityManager;
+        $this->conversationService = $conversationService;
     }
 
     #[
@@ -97,6 +100,12 @@ class ChatUserModuleController extends AbstractController
     ): Response {
         $user = $userRepository->find($this->getUser());
         $conversations = $user->getConversations();
+        foreach ($conversations as $conversation) {
+            $this->conversationService->setLatestActiveUser($conversation);
+            $this->conversationService->setLatestMessage($conversation);
+            $this->entityManager->persist($conversation);
+        }
+        $this->entityManager->flush();
         return $this->json(
             $conversations,
             200,
@@ -163,13 +172,20 @@ class ChatUserModuleController extends AbstractController
         if (!$conversation) {
             return $this->json(["error" => "Conversation not found"], 404);
         }
+
+        if (!$conversation->getUsers()->contains($this->getUser())) {
+            return $this->json(["error" => "You're not part of this conversation"], 403);
+        }
+        
         $message = new Message();
         $message->setContent($data["content"]);
         $message->setType($data["type"] ?? "text");
         $message->setSender($this->getUser());
         $message->setConversation($conversation);
         $message->setAttachment($data["attachment"]);
+        $conversation->setLastActivity(new \DateTimeImmutable());
         $this->entityManager->persist($message);
+        $conversation->setLastMessage($message);
         $this->entityManager->flush();
         $response = [
             "detail" => "Your message has been sent",

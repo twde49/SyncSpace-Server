@@ -56,6 +56,15 @@ class Conversation
     #[Groups("conversation:read")]
     private ?string $avatar = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups("conversation:read")]
+    private ?User $lastActiveUser = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups("conversation:read")]
+    private ?Message $lastMessage = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -191,6 +200,30 @@ class Conversation
     public function setAvatar(?string $avatar): static
     {
         $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getLastActiveUser(): ?User
+    {
+        return $this->lastActiveUser;
+    }
+
+    public function setLastActiveUser(?User $lastActiveUser): static
+    {
+        $this->lastActiveUser = $lastActiveUser;
+
+        return $this;
+    }
+
+    public function getLastMessage(): ?Message
+    {
+        return $this->lastMessage;
+    }
+
+    public function setLastMessage(?Message $lastMessage): static
+    {
+        $this->lastMessage = $lastMessage;
 
         return $this;
     }

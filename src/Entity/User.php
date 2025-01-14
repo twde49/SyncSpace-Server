@@ -52,9 +52,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups("conversation:read")]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups("conversation:read")]
     private ?string $lastName = null;
 
     public function __construct()
