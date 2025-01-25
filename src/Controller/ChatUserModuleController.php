@@ -161,7 +161,7 @@ class ChatUserModuleController extends AbstractController
     #[
         Route(
             "/conversation/{id}/message/new",
-            name: "send_message",
+            name: "send_message_post",
             methods: ["POST"]
         )
     ]
@@ -176,7 +176,7 @@ class ChatUserModuleController extends AbstractController
         if (!$conversation->getUsers()->contains($this->getUser())) {
             return $this->json(["error" => "You're not part of this conversation"], 403);
         }
-        
+
         $message = new Message();
         $message->setContent($data["content"]);
         $message->setType($data["type"] ?? "text");
@@ -221,7 +221,7 @@ class ChatUserModuleController extends AbstractController
     ]
     public function editMessage(?Message $message): Response
     {
-        if (!message) {
+        if (!$message) {
             return $this->json(["error" => "Message not found"], 404);
         }
         $request = Request::createFromGlobals();
