@@ -52,6 +52,7 @@ class ChatUserModuleController extends AbstractController
         $conversation->setCreatedBy($this->getUser());
         $conversation->addUser($this->getUser());
         $conversation->setName($data["name"] ?? null);
+        $conversation->setLastActiveUser($this->getUser());
         foreach ($userIds as $userId) {
             $user = $userRepository->find($userId);
             if (!$user) {

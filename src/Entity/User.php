@@ -65,11 +65,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'author', orphanRemoval: true)]
     private Collection $notes;
 
+    /**
+     * @var Collection<int, PasswordItem>
+     */
+    #[ORM\OneToMany(targetEntity: PasswordItem::class, mappedBy: 'associatedTo', orphanRemoval: true)]
+    private Collection $passwordItems;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->conversations = new ArrayCollection();
         $this->notes = new ArrayCollection();
+        $this->passwordItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -252,6 +259,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($note->getAuthor() === $this) {
                 $note->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PasswordItem>
+     */
+    public function getPasswordItems(): Collection
+    {
+        return $this->passwordItems;
+    }
+
+    public function addPasswordItem(PasswordItem $passwordItem): static
+    {
+        if (!$this->passwordItems->contains($passwordItem)) {
+            $this->passwordItems->add($passwordItem);
+            $passwordItem->setAssociatedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removePasswordItem(PasswordItem $passwordItem): static
+    {
+        if ($this->passwordItems->removeElement($passwordItem)) {
+            // set the owning side to null (unless already changed)
+            if ($passwordItem->getAssociatedTo() === $this) {
+                $passwordItem->setAssociatedTo(null);
             }
         }
 
