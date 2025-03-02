@@ -4,13 +4,19 @@ namespace App\Controller;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Repository\ConversationRepository;
+use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ConversationService;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route("api")]
 class ChatUserModuleController extends AbstractController
@@ -24,6 +30,9 @@ class ChatUserModuleController extends AbstractController
         $this->conversationService = $conversationService;
     }
 
+    /**
+     * @throws GuzzleException
+     */
     #[
         Route(
             "/conversation/new",
@@ -32,15 +41,19 @@ class ChatUserModuleController extends AbstractController
         )
     ]
     public function createConversation(
-        Request $request,
-        UserRepository $userRepository
-    ): Response {
+        Request                $request,
+        UserRepository         $userRepository,
+        ConversationRepository $conversationRepository,
+        NormalizerInterface $normalizer
+    ): Response
+    {
         $data = $request->toArray();
         $userIds = $data["userIds"] ?? [];
         $conversation = new Conversation();
         $conversation->setCreatedBy($this->getUser());
         $conversation->addUser($this->getUser());
         $conversation->setName($data["name"] ?? null);
+        $conversation->setLastActiveUser($this->getUser());
         foreach ($userIds as $userId) {
             $user = $userRepository->find($userId);
             if (!$user) {
@@ -74,9 +87,24 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->persist($conversation);
         $this->entityManager->flush();
 
+        $client = new Client();
+        $allConversations = $conversationRepository->findAll();
+        $context = ['groups' => 'conversation:read'];
+        $normalizedConversations = $normalizer->normalize($allConversations, null, $context);
+
+        $client->post('http://localhost:6969/webhook/update-conversations', [
+            'json' => ['conversations' => $normalizedConversations]
+        ]);
+
+
         return $this->json(
-            ["message" => "Your new conversation has been created"],
-            201
+            [
+                "message" => "Your new conversation has been created",
+                "content" => $conversation
+            ],
+            201,
+            [],
+            ['groups' => 'conversation:read']
         );
     }
 
@@ -97,7 +125,8 @@ class ChatUserModuleController extends AbstractController
     #[Route("/conversations", name: "show_all_conversations", methods: ["GET"])]
     public function showAllConversations(
         UserRepository $userRepository
-    ): Response {
+    ): Response
+    {
         $user = $userRepository->find($this->getUser());
         $conversations = $user->getConversations();
         foreach ($conversations as $conversation) {
@@ -158,6 +187,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json(["message" => "Conversation updated"], 200);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     #[
         Route(
             "/conversation/{id}/message/new",
@@ -165,9 +197,8 @@ class ChatUserModuleController extends AbstractController
             methods: ["POST"]
         )
     ]
-    public function sendMessage(?Conversation $conversation): Response
+    public function sendMessage(?Conversation $conversation, Request $request, MessageRepository $messageRepository, SerializerInterface $serializer): Response
     {
-        $request = Request::createFromGlobals();
         $data = $request->toArray();
         if (!$conversation) {
             return $this->json(["error" => "Conversation not found"], 404);
@@ -187,6 +218,16 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->persist($message);
         $conversation->setLastMessage($message);
         $this->entityManager->flush();
+
+        $client = new Client();
+        $messages = $messageRepository->findBy(['conversation' => $conversation]);
+        $context = ['groups' => 'conversation:read'];
+        $jsonMessages = $serializer->serialize($messages, 'json', $context);
+
+        $client->post('http://localhost:6969/webhook/update-messages', [
+            'json' => ['messages' => $jsonMessages]]);
+
+
         $response = [
             "detail" => "Your message has been sent",
             "Status" => 201,
@@ -219,12 +260,11 @@ class ChatUserModuleController extends AbstractController
             methods: ["PUT"]
         )
     ]
-    public function editMessage(?Message $message): Response
+    public function editMessage(?Message $message, Request $request): Response
     {
         if (!$message) {
             return $this->json(["error" => "Message not found"], 404);
         }
-        $request = Request::createFromGlobals();
         $data = $request->toArray();
         if (isset($data["content"])) {
             $message->setContent($data["content"]);

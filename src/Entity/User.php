@@ -20,11 +20,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups("conversation:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups("conversation:read")]
+    #[Groups("conversation:read","user:read")]
     private ?string $email = null;
 
     /**
@@ -52,17 +52,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?string $lastName = null;
+
+    /**
+     * @var Collection<int, Note>
+     */
+    #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'author', orphanRemoval: true)]
+    private Collection $notes;
+
+    /**
+     * @var Collection<int, PasswordItem>
+     */
+    #[ORM\OneToMany(targetEntity: PasswordItem::class, mappedBy: 'associatedTo', orphanRemoval: true)]
+    private Collection $passwordItems;
+
+    /**
+     * @var Collection<int, File>
+     */
+    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $files;
+
+    /**
+     * @var Collection<int, File>
+     */
+    #[ORM\ManyToMany(targetEntity: File::class, mappedBy: 'sharedWith')]
+    private Collection $sharedFiles;
 
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->conversations = new ArrayCollection();
+        $this->notes = new ArrayCollection();
+        $this->passwordItems = new ArrayCollection();
+        $this->files = new ArrayCollection();
+        $this->sharedFiles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,6 +245,122 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
+        
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Note $note): static
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes->add($note);
+            $note->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): static
+    {
+        if ($this->notes->removeElement($note)) {
+            if ($note->getAuthor() === $this) {
+                $note->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PasswordItem>
+     */
+    public function getPasswordItems(): Collection
+    {
+        return $this->passwordItems;
+    }
+
+    public function addPasswordItem(PasswordItem $passwordItem): static
+    {
+        if (!$this->passwordItems->contains($passwordItem)) {
+            $this->passwordItems->add($passwordItem);
+            $passwordItem->setAssociatedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removePasswordItem(PasswordItem $passwordItem): static
+    {
+        if ($this->passwordItems->removeElement($passwordItem)) {
+            // set the owning side to null (unless already changed)
+            if ($passwordItem->getAssociatedTo() === $this) {
+                $passwordItem->setAssociatedTo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getOwner() === $this) {
+                $file->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getSharedFiles(): Collection
+    {
+        return $this->sharedFiles;
+    }
+
+    public function addSharedFile(File $sharedFile): static
+    {
+        if (!$this->sharedFiles->contains($sharedFile)) {
+            $this->sharedFiles->add($sharedFile);
+            $sharedFile->shareWith($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSharedFile(File $sharedFile): static
+    {
+        if ($this->sharedFiles->removeElement($sharedFile)) {
+            $sharedFile->revokeAccess($this);
+        }
 
         return $this;
     }
