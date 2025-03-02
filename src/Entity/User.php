@@ -20,11 +20,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups("conversation:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups("conversation:read")]
+    #[Groups("conversation:read","user:read")]
     private ?string $email = null;
 
     /**
@@ -52,11 +52,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?string $lastName = null;
 
     /**
@@ -71,12 +71,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: PasswordItem::class, mappedBy: 'associatedTo', orphanRemoval: true)]
     private Collection $passwordItems;
 
+    /**
+     * @var Collection<int, File>
+     */
+    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $files;
+
+    /**
+     * @var Collection<int, File>
+     */
+    #[ORM\ManyToMany(targetEntity: File::class, mappedBy: 'sharedWith')]
+    private Collection $sharedFiles;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->conversations = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->passwordItems = new ArrayCollection();
+        $this->files = new ArrayCollection();
+        $this->sharedFiles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -256,7 +270,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeNote(Note $note): static
     {
         if ($this->notes->removeElement($note)) {
-            // set the owning side to null (unless already changed)
             if ($note->getAuthor() === $this) {
                 $note->setAuthor(null);
             }
@@ -290,6 +303,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($passwordItem->getAssociatedTo() === $this) {
                 $passwordItem->setAssociatedTo(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getOwner() === $this) {
+                $file->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getSharedFiles(): Collection
+    {
+        return $this->sharedFiles;
+    }
+
+    public function addSharedFile(File $sharedFile): static
+    {
+        if (!$this->sharedFiles->contains($sharedFile)) {
+            $this->sharedFiles->add($sharedFile);
+            $sharedFile->shareWith($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSharedFile(File $sharedFile): static
+    {
+        if ($this->sharedFiles->removeElement($sharedFile)) {
+            $sharedFile->revokeAccess($this);
         }
 
         return $this;

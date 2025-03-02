@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route("api")]
@@ -43,7 +44,7 @@ class ChatUserModuleController extends AbstractController
         Request                $request,
         UserRepository         $userRepository,
         ConversationRepository $conversationRepository,
-        SerializerInterface $serializer
+        NormalizerInterface $normalizer
     ): Response
     {
         $data = $request->toArray();
@@ -89,7 +90,7 @@ class ChatUserModuleController extends AbstractController
         $client = new Client();
         $allConversations = $conversationRepository->findAll();
         $context = ['groups' => 'conversation:read'];
-        $normalizedConversations = $serializer->normalize($allConversations, null, $context);
+        $normalizedConversations = $normalizer->normalize($allConversations, null, $context);
 
         $client->post('http://localhost:6969/webhook/update-conversations', [
             'json' => ['conversations' => $normalizedConversations]
