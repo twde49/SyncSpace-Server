@@ -57,7 +57,7 @@ class Conversation
     private ?string $avatar = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups("conversation:read")]
     private ?User $lastActiveUser = null;
 

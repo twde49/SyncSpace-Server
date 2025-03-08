@@ -41,7 +41,6 @@ class PasswordItemController extends AbstractController
         $passwordItem->setName($data['name']);
         $passwordItem->setEmail($data['email']);
 
-        // 🔒 Chiffrement sécurisé
         $encrypted = $encryptionService->encryptData($data['password']);
         $passwordItem->setPasswordEncrypted($encrypted['ciphertext'], $encrypted['iv']);
 
@@ -52,21 +51,54 @@ class PasswordItemController extends AbstractController
     }
 
     #[Route('/list', methods: ['GET'])]
-    public function listPasswords(PasswordItemRepository $passwordRepo, EncryptionService $encryptionService): JsonResponse
+    public function listPasswords(PasswordItemRepository $passwordRepo): JsonResponse
     {
         $user = $this->getUser();
         $passwords = $passwordRepo->findBy(['associatedTo' => $user]);
-
+    
         $response = [];
         foreach ($passwords as $passwordItem) {
             $response[] = [
                 'id' => $passwordItem->getId(),
                 'name' => $passwordItem->getName(),
                 'email' => $passwordItem->getEmail(),
-                'password' => $encryptionService->decryptData($passwordItem->getPasswordEncrypted(), $passwordItem->getIv())
+                'passwordEncrypted' => $passwordItem->getPasswordEncrypted(),
+                'iv' => $passwordItem->getIv()
             ];
         }
-
-        return new JsonResponse($response);
+    
+        return $this->json($response);
     }
+
+    
+    #[Route('/set-master-password', methods: ['POST'])]
+    public function setMasterPassword(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        /** @var User $user */
+        $user = $this->getUser();
+    
+        if ($user->getMasterPasswordHash()) {
+            return $this->json(["error" => "Master password is already set"], 400);
+        }
+    
+        $user->setMasterPasswordHash($data['masterPassword']);
+        $em->persist($user);
+        $em->flush();
+    
+        return $this->json(["message" => "Master password set successfully"], 201);
+    }
+    
+    #[Route('/get-master-password-hash', methods: ['GET'])]
+    public function getMasterPasswordHash(): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+    
+        return $this->json([
+            "hash" => $user->getMasterPasswordHash() ?? null
+        ]);
+    }
+
+
 }
