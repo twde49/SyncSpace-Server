@@ -32,7 +32,7 @@ final class Version20250301174523 extends AbstractMigration
         $this->addSql('CREATE TABLE conversation (
             id SERIAL NOT NULL,
             created_by_id INT NOT NULL,
-            last_active_user_id INT NOT NULL,
+            last_active_user_id INT DEFAULT NULL,
             last_message_id INT DEFAULT NULL,
             name VARCHAR(255) DEFAULT NULL,
             type VARCHAR(255) NOT NULL,

@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups("conversation:read","user:read")]
+    #[Groups(["conversation:read","user:read"])]
     private ?string $email = null;
 
     /**
@@ -82,6 +82,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\ManyToMany(targetEntity: File::class, mappedBy: 'sharedWith')]
     private Collection $sharedFiles;
+
+    #[ORM\Column(length: 10000, nullable: true)]
+    private ?string $masterPasswordHash = null;
 
     public function __construct()
     {
@@ -363,5 +366,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    #[Groups(["user:read"])]
+    public function isMasterPasswordSet(): bool
+    {
+        return !empty($this->masterPassword);
+    }
+    
+    public function getMasterPasswordHash(): ?string
+    {
+        return $this->masterPasswordHash;
+    }
+
+    public function setMasterPasswordHash(string $password): self
+    {
+        $salt = "syncspace_salt";
+        $hash = hash_pbkdf2("sha256", $password, $salt, 100000, 64);
+        $this->masterPasswordHash = $hash;
+        
+        return $this;
+    }
+    
+    public function verifyMasterPassword(string $password): bool
+    {
+        $salt = "syncspace_salt";
+        return hash_pbkdf2("sha256", $password, $salt, 100000, 64) === $this->masterPasswordHash;
     }
 }

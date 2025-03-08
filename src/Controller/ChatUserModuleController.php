@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\User;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
@@ -275,5 +276,24 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->persist($message);
         $this->entityManager->flush();
         return $this->json(["message" => "Message updated"], 200);
+    }
+    
+    
+    #[
+        Route(
+            "/conversation/user/search",
+            name: "search_user",
+            methods: ["POST"]
+        )
+    ]
+    public function searchUser(Request $request):Response
+    {
+        $data = $request->toArray();
+        $query = $this->entityManager->getRepository(User::class)->createQueryBuilder('u');
+        $query->where('LOWER(u.firstName) LIKE LOWER(:firstName)');
+        $query->setParameter('firstName', '%' . strtolower($data['username']) . '%');
+        $users = $query->getQuery()->getResult();
+        $searchedResult = array_values($users);
+        return $this->json($searchedResult, 200,[],['groups'=>"user:read"]);
     }
 }
