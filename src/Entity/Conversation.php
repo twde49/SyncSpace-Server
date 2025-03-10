@@ -35,7 +35,7 @@ class Conversation
     /**
      * @var Collection<int, Message>
      */
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups("conversation:read")]
     private Collection $messages;
 
@@ -61,7 +61,7 @@ class Conversation
     #[Groups("conversation:read")]
     private ?User $lastActiveUser = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist'])]
     #[Groups("conversation:read")]
     private ?Message $lastMessage = null;
 
