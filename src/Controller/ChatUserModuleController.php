@@ -135,6 +135,7 @@ class ChatUserModuleController extends AbstractController
             $this->conversationService->setLatestMessage($conversation);
             $this->entityManager->persist($conversation);
         }
+        $conversations = array_reverse($conversations->toArray());
         $this->entityManager->flush();
         return $this->json(
             $conversations,
@@ -153,8 +154,17 @@ class ChatUserModuleController extends AbstractController
     ]
     public function deleteConversation(Conversation $conversation): Response
     {
+        $conversation->setLastMessage(null);
+        $this->entityManager->flush(); 
+        
+        foreach ($conversation->getMessages() as $message) {
+            $this->entityManager->remove($message);
+        }
+        $this->entityManager->flush();
+        
         $this->entityManager->remove($conversation);
         $this->entityManager->flush();
+
         return $this->json(["message" => "Conversation deleted"], 200);
     }
 
@@ -249,8 +259,26 @@ class ChatUserModuleController extends AbstractController
         if (!$message) {
             return $this->json(["error" => "Message not found"], 404);
         }
+        
+        if ($message->getSender() !== $this->getUser()) {
+            return $this->json(["error" => "You are not authorized to delete this message"], 403);
+        }
+        
+        $conversation = $message->getConversation();
+
+        if ($conversation->getLastMessage() === $message) {
+            $conversation->setLastMessage(null);
+            $this->entityManager->persist($conversation);
+            $this->entityManager->flush();
+        }
+
+        $conversation->removeMessage($message);
+        $this->entityManager->persist($conversation);
+        $this->entityManager->flush();
+
         $this->entityManager->remove($message);
         $this->entityManager->flush();
+
         return $this->json(["message" => "Message deleted"], 200);
     }
 
