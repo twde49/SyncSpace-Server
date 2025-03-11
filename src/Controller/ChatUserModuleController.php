@@ -9,6 +9,7 @@ use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ConversationService;
+use App\Service\NotificationService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,12 +24,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ChatUserModuleController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
-    private ConversationService $conversationService;
-
-    public function __construct(EntityManagerInterface $entityManager, ConversationService $conversationService)
+    
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->conversationService = $conversationService;
     }
 
     /**
@@ -45,7 +44,8 @@ class ChatUserModuleController extends AbstractController
         Request                $request,
         UserRepository         $userRepository,
         ConversationRepository $conversationRepository,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        NotificationService $notificationService
     ): Response
     {
         $data = $request->toArray();
@@ -93,10 +93,20 @@ class ChatUserModuleController extends AbstractController
         $context = ['groups' => 'conversation:read'];
         $normalizedConversations = $normalizer->normalize($allConversations, null, $context);
 
-        $client->post('http://localhost:6969/webhook/update-conversations', [
+        $websocketbaseurl = $this->getParameter('websocket_url');
+        $client->post($websocketbaseurl . "/webhook/update-conversations", [
             'json' => ['conversations' => $normalizedConversations]
         ]);
 
+        foreach ($conversation->getUsers() as $user) {
+            $notificationService->sendNotification(
+                'Vous avez été ajouté à une nouvelle conversation',
+                'Nouvelle conversation avec ' . implode(', ', array_map(function($user) {
+                    return $user->getFirstName() . ' ' . $user->getLastName();
+                }, $conversation->getUsers()->toArray())),
+                $user
+            );
+        }
 
         return $this->json(
             [
@@ -125,14 +135,15 @@ class ChatUserModuleController extends AbstractController
 
     #[Route("/conversations", name: "show_all_conversations", methods: ["GET"])]
     public function showAllConversations(
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        ConversationService $conversationService
     ): Response
     {
         $user = $userRepository->find($this->getUser());
         $conversations = $user->getConversations();
         foreach ($conversations as $conversation) {
-            $this->conversationService->setLatestActiveUser($conversation);
-            $this->conversationService->setLatestMessage($conversation);
+            $conversationService->setLatestActiveUser($conversation);
+            $conversationService->setLatestMessage($conversation);
             $this->entityManager->persist($conversation);
         }
         $conversations = array_reverse($conversations->toArray());

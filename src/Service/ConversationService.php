@@ -1,8 +1,6 @@
 <?php
 namespace App\Service;
 use App\Entity\Conversation;
-use App\Entity\Message;
-use App\Repository\ConversationRepository;
 class ConversationService {
 
     public function setLatestActiveUser(Conversation $conversation): Conversation

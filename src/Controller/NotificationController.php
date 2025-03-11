@@ -20,6 +20,7 @@ class NotificationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $notifications = $notificationRepository->getUnreadNotifications($user);
+        
         return $this->json($notifications, Response::HTTP_OK, [], ['groups' => ['notification:read']]);
     }
     
@@ -45,5 +46,20 @@ class NotificationController extends AbstractController
         $notification->setRead(true);
         $manager->flush();
         return $this->json($notification, Response::HTTP_OK, [], ['groups' => ['notification:read']]);
+    }
+    
+    #[Route('/readAll', name: 'app_notification_read_all',methods: ['PUT'])]
+    public function readAllNotifications(EntityManagerInterface $manager): Response
+    {
+        /**
+         * @var User $user
+         */
+        $user = $this->getUser();
+        $notifications = $this->notificationRepository->findBy(['relatedTo' => $user]);
+        foreach ($notifications as $notification) {
+            $notification->setRead(true);
+        }
+        $manager->flush();
+        return $this->json([], Response::HTTP_OK, [], ['groups' => ['notification:read']]);
     }
 }

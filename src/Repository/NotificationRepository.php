@@ -28,7 +28,7 @@ class NotificationRepository extends ServiceEntityRepository
                 ->andWhere('n.relatedTo = :user')
                 ->setParameter('val', false)
                 ->setParameter('user', $user)
-                ->orderBy('n.id', 'ASC')
+                ->orderBy('n.id', 'DESC')
                 ->getQuery()
                 ->getResult()
             ;
