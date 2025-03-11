@@ -17,14 +17,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["conversation:read","user:read"])]
+    #[Groups(["conversation:read","user:read",'notification:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(["conversation:read","user:read"])]
+    #[Groups(["conversation:read","user:read",'notification:read'])]
     private ?string $email = null;
 
     /**
@@ -52,11 +53,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["conversation:read","user:read"])]
+    #[Groups(["conversation:read","user:read",'notification:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["conversation:read","user:read"])]
+    #[Groups(["conversation:read","user:read",'notification:read'])]
     private ?string $lastName = null;
 
     /**
@@ -86,6 +87,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 10000, nullable: true)]
     private ?string $masterPasswordHash = null;
 
+    /**
+     * @var Collection<int, Notification>
+     */
+    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'relatedTo', orphanRemoval: true)]
+    private Collection $notifications;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -94,6 +101,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->passwordItems = new ArrayCollection();
         $this->files = new ArrayCollection();
         $this->sharedFiles = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -392,5 +400,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $salt = "syncspace_salt";
         return hash_pbkdf2("sha256", $password, $salt, 100000, 64) === $this->masterPasswordHash;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setRelatedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getRelatedTo() === $this) {
+                $notification->setRelatedTo(null);
+            }
+        }
+
+        return $this;
     }
 }
