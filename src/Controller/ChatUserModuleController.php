@@ -97,9 +97,7 @@ class ChatUserModuleController extends AbstractController
         );
 
         $websocketbaseurl = $this->getParameter("websocket_url");
-        $client->post($websocketbaseurl . "/webhook/update-conversations", [
-            "json" => ["conversations" => $normalizedConversations],
-        ]);
+        $client->post($websocketbaseurl . "/webhook/refreshConversations",);
 
         foreach ($conversation->getUsers() as $user) {
             if ($user !== $this->getUser()) {
@@ -185,6 +183,9 @@ class ChatUserModuleController extends AbstractController
 
         $this->entityManager->remove($conversation);
         $this->entityManager->flush();
+        
+        $client = new Client();
+        $client->request('POST', 'http://localhost:6969/webhook/refreshConversations');
 
         return $this->json(["message" => "Conversation deleted"], 200);
     }
@@ -273,11 +274,14 @@ class ChatUserModuleController extends AbstractController
         $client->post("http://localhost:6969/webhook/update-messages", [
             "json" => ["messages" => $jsonMessages],
         ]);
+        
+        $client->post("http://localhost:6969/webhook/refreshConversations");
 
 
         foreach ($conversation->getUsers() as $user) {
             if ($user !== $currentUser) {
                 $notificationService->sendNotification(
+                    "Nouveau message de " .
                     $currentUser->getFirstName() .
                     " " .
                     $currentUser->getLastName(),

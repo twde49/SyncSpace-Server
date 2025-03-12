@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,6 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
+use GuzzleHttp\Client;
 
 #[Route('/api/events')]
 class EventController extends AbstractController
@@ -30,7 +32,7 @@ class EventController extends AbstractController
     }
     
     #[Route('/create', name: 'app_event_create', methods: ['POST'])]
-    public function createEvent(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer,UserRepository $userRepository):Response
+    public function createEvent(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer,UserRepository $userRepository, NotificationService $notificationService):Response
     {        
         $data = json_decode($request->getContent(), true);
         
@@ -45,6 +47,23 @@ class EventController extends AbstractController
         $newEvent->setOrganizer($this->getUser());
         $manager->persist($newEvent);
         $manager->flush();
+        
+        $client = new Client();
+
+        $client->post("http://localhost:6969/webhook/refreshCalendar");
+        
+        
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        foreach ($newEvent->getParticipants() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    "Nouvel événement organisé par " . $currentUser->getFirstName() . " " . $currentUser->getLastName(),
+                    $newEvent->getTitle(),
+                    $user
+                );
+            }
+        }
         
         return $this->json($newEvent, Response::HTTP_CREATED, [], ['groups' => ['event:read']]);
     }
