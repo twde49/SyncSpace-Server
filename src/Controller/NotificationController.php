@@ -49,13 +49,13 @@ class NotificationController extends AbstractController
     }
     
     #[Route('/readAll', name: 'app_notification_read_all',methods: ['PUT'])]
-    public function readAllNotifications(EntityManagerInterface $manager): Response
+    public function readAllNotifications(EntityManagerInterface $manager, NotificationRepository $notificationRepository): Response
     {
         /**
          * @var User $user
          */
         $user = $this->getUser();
-        $notifications = $this->notificationRepository->findBy(['relatedTo' => $user]);
+        $notifications = $notificationRepository->findBy(['relatedTo' => $user]);
         foreach ($notifications as $notification) {
             $notification->setRead(true);
         }

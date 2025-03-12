@@ -6,7 +6,11 @@ use App\Repository\FileRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\File;
@@ -414,6 +418,28 @@ class FileController extends AbstractController
             [],
             ["groups" => ["file:read", "user:read"]]
         );
+    }
+    
+    
+    #[Route('/preview/{id}', name: 'file_preview', methods: ['GET'])]
+    public function previewFile(File $file, UploaderHelper $uploaderHelper): Response
+    {
+        $filePath = $uploaderHelper->asset($file, 'file');
+    
+        if (!$filePath) {
+            throw new NotFoundHttpException('File not found.');
+        }
+    
+        $fullPath = $this->getParameter('kernel.project_dir') . "/public" . $filePath;
+    
+        if (!file_exists($fullPath)) {
+            throw new NotFoundHttpException('File not found on disk.');
+        }
+    
+        $response = new BinaryFileResponse($fullPath);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE);
+    
+        return $response;
     }
     
 

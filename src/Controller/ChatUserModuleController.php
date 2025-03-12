@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ChatUserModuleController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
-    
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -41,13 +41,12 @@ class ChatUserModuleController extends AbstractController
         )
     ]
     public function createConversation(
-        Request                $request,
-        UserRepository         $userRepository,
+        Request $request,
+        UserRepository $userRepository,
         ConversationRepository $conversationRepository,
         NormalizerInterface $normalizer,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $data = $request->toArray();
         $userIds = $data["userIds"] ?? [];
         $conversation = new Conversation();
@@ -90,32 +89,44 @@ class ChatUserModuleController extends AbstractController
 
         $client = new Client();
         $allConversations = $conversationRepository->findAll();
-        $context = ['groups' => 'conversation:read'];
-        $normalizedConversations = $normalizer->normalize($allConversations, null, $context);
+        $context = ["groups" => "conversation:read"];
+        $normalizedConversations = $normalizer->normalize(
+            $allConversations,
+            null,
+            $context
+        );
 
-        $websocketbaseurl = $this->getParameter('websocket_url');
+        $websocketbaseurl = $this->getParameter("websocket_url");
         $client->post($websocketbaseurl . "/webhook/update-conversations", [
-            'json' => ['conversations' => $normalizedConversations]
+            "json" => ["conversations" => $normalizedConversations],
         ]);
 
         foreach ($conversation->getUsers() as $user) {
-            $notificationService->sendNotification(
-                'Vous avez été ajouté à une nouvelle conversation',
-                'Nouvelle conversation avec ' . implode(', ', array_map(function($user) {
-                    return $user->getFirstName() . ' ' . $user->getLastName();
-                }, $conversation->getUsers()->toArray())),
-                $user
-            );
+            if ($user !== $this->getUser()) {
+                $notificationService->sendNotification(
+                    "Vous avez été ajouté à une nouvelle conversation",
+                    "Nouvelle conversation avec " .
+                        implode(
+                            ", ",
+                            array_map(function ($user) {
+                                return $user->getFirstName() .
+                                    " " .
+                                    $user->getLastName();
+                            }, $conversation->getUsers()->toArray())
+                        ),
+                    $user
+                );
+            }
         }
 
         return $this->json(
             [
                 "message" => "Your new conversation has been created",
-                "content" => $conversation
+                "content" => $conversation,
             ],
             201,
             [],
-            ['groups' => 'conversation:read']
+            ["groups" => "conversation:read"]
         );
     }
 
@@ -137,8 +148,7 @@ class ChatUserModuleController extends AbstractController
     public function showAllConversations(
         UserRepository $userRepository,
         ConversationService $conversationService
-    ): Response
-    {
+    ): Response {
         $user = $userRepository->find($this->getUser());
         $conversations = $user->getConversations();
         foreach ($conversations as $conversation) {
@@ -166,13 +176,13 @@ class ChatUserModuleController extends AbstractController
     public function deleteConversation(Conversation $conversation): Response
     {
         $conversation->setLastMessage(null);
-        $this->entityManager->flush(); 
-        
+        $this->entityManager->flush();
+
         foreach ($conversation->getMessages() as $message) {
             $this->entityManager->remove($message);
         }
         $this->entityManager->flush();
-        
+
         $this->entityManager->remove($conversation);
         $this->entityManager->flush();
 
@@ -219,15 +229,27 @@ class ChatUserModuleController extends AbstractController
             methods: ["POST"]
         )
     ]
-    public function sendMessage(?Conversation $conversation, Request $request, MessageRepository $messageRepository, SerializerInterface $serializer): Response
-    {
+    public function sendMessage(
+        ?Conversation $conversation,
+        Request $request,
+        MessageRepository $messageRepository,
+        SerializerInterface $serializer,
+        NotificationService $notificationService
+    ): Response {
+        /** @var User $currentUser */
+
+        $currentUser = $this->getUser();
+        
         $data = $request->toArray();
         if (!$conversation) {
             return $this->json(["error" => "Conversation not found"], 404);
         }
 
         if (!$conversation->getUsers()->contains($this->getUser())) {
-            return $this->json(["error" => "You're not part of this conversation"], 403);
+            return $this->json(
+                ["error" => "You're not part of this conversation"],
+                403
+            );
         }
 
         $message = new Message();
@@ -242,13 +264,28 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->flush();
 
         $client = new Client();
-        $messages = $messageRepository->findBy(['conversation' => $conversation]);
-        $context = ['groups' => 'conversation:read'];
-        $jsonMessages = $serializer->serialize($messages, 'json', $context);
+        $messages = $messageRepository->findBy([
+            "conversation" => $conversation,
+        ]);
+        $context = ["groups" => "conversation:read"];
+        $jsonMessages = $serializer->serialize($messages, "json", $context);
 
-        $client->post('http://localhost:6969/webhook/update-messages', [
-            'json' => ['messages' => $jsonMessages]]);
+        $client->post("http://localhost:6969/webhook/update-messages", [
+            "json" => ["messages" => $jsonMessages],
+        ]);
 
+
+        foreach ($conversation->getUsers() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    $currentUser->getFirstName() .
+                    " " .
+                    $currentUser->getLastName(),
+                    $message->getContent(),
+                    $user
+                );
+            }
+        }
 
         $response = [
             "detail" => "Your message has been sent",
@@ -270,11 +307,14 @@ class ChatUserModuleController extends AbstractController
         if (!$message) {
             return $this->json(["error" => "Message not found"], 404);
         }
-        
+
         if ($message->getSender() !== $this->getUser()) {
-            return $this->json(["error" => "You are not authorized to delete this message"], 403);
+            return $this->json(
+                ["error" => "You are not authorized to delete this message"],
+                403
+            );
         }
-        
+
         $conversation = $message->getConversation();
 
         if ($conversation->getLastMessage() === $message) {
@@ -316,8 +356,7 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->flush();
         return $this->json(["message" => "Message updated"], 200);
     }
-    
-    
+
     #[
         Route(
             "/conversation/user/search",
@@ -325,14 +364,46 @@ class ChatUserModuleController extends AbstractController
             methods: ["POST"]
         )
     ]
-    public function searchUser(Request $request):Response
+    public function searchUser(Request $request): Response
     {
         $data = $request->toArray();
-        $query = $this->entityManager->getRepository(User::class)->createQueryBuilder('u');
-        $query->where('LOWER(u.firstName) LIKE LOWER(:firstName)');
-        $query->setParameter('firstName', '%' . strtolower($data['username']) . '%');
+        $query = $this->entityManager
+            ->getRepository(User::class)
+            ->createQueryBuilder("u");
+        $query->where("LOWER(u.firstName) LIKE LOWER(:firstName)");
+        $query->setParameter(
+            "firstName",
+            "%" . strtolower($data["username"]) . "%"
+        );
         $users = $query->getQuery()->getResult();
         $searchedResult = array_values($users);
-        return $this->json($searchedResult, 200,[],['groups'=>"user:read"]);
+        return $this->json($searchedResult, 200, [], ["groups" => "user:read"]);
+    }
+    
+    
+    #[Route("/user/setOnline/{email}", methods: ["PUT"])]
+    public function setOnline(string $email,UserRepository $userRepository): Response
+    {
+        $user = $userRepository->findOneBy(["email" => $email]);
+        if (!$user) {
+            throw $this->createNotFoundException("User not found");
+        }
+        $user->setOnline(true);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        return $this->json(["message" => "User set online"], 200);
+    }
+    
+    #[Route("/user/setOffline/{email}", methods: ["PUT"])]
+    public function setOffline(string $email,UserRepository $userRepository): Response
+    {
+        $user = $userRepository->findOneBy(["email" => $email]);
+        if (!$user) {
+            throw $this->createNotFoundException("User not found");
+        }
+        $user->setOnline(false);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        return $this->json(["message" => "User set offline"], 200);
     }
 }

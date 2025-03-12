@@ -21,11 +21,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["conversation:read","user:read",'notification:read'])]
+    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(["conversation:read","user:read",'notification:read'])]
+    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
     private ?string $email = null;
 
     /**
@@ -53,11 +53,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["conversation:read","user:read",'notification:read'])]
+    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["conversation:read","user:read",'notification:read'])]
+    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
     private ?string $lastName = null;
 
     /**
@@ -93,6 +93,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'relatedTo', orphanRemoval: true)]
     private Collection $notifications;
 
+    /**
+     * @var Collection<int, Event>
+     */
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organizer', orphanRemoval: true)]
+    private Collection $events;
+
+    /**
+     * @var Collection<int, Event>
+     */
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'participants')]
+    private Collection $eventsAsParticipant;
+
+    #[ORM\Column]
+    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
+    private ?bool $isOnline = null;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -102,6 +118,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->files = new ArrayCollection();
         $this->sharedFiles = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->events = new ArrayCollection();
+        $this->eventsAsParticipant = new ArrayCollection();
+        $this->isOnline = false;
     }
 
     public function getId(): ?int
@@ -428,6 +447,75 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $notification->setRelatedTo(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): static
+    {
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
+            $event->setOrganizer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): static
+    {
+        if ($this->events->removeElement($event)) {
+            // set the owning side to null (unless already changed)
+            if ($event->getOrganizer() === $this) {
+                $event->setOrganizer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEventsAsParticipant(): Collection
+    {
+        return $this->eventsAsParticipant;
+    }
+
+    public function addEventsAsParticipant(Event $eventsAsParticipant): static
+    {
+        if (!$this->eventsAsParticipant->contains($eventsAsParticipant)) {
+            $this->eventsAsParticipant->add($eventsAsParticipant);
+            $eventsAsParticipant->addParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventsAsParticipant(Event $eventsAsParticipant): static
+    {
+        if ($this->eventsAsParticipant->removeElement($eventsAsParticipant)) {
+            $eventsAsParticipant->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function isOnline(): ?bool
+    {
+        return $this->isOnline;
+    }
+
+    public function setOnline(bool $isOnline): static
+    {
+        $this->isOnline = $isOnline;
 
         return $this;
     }
