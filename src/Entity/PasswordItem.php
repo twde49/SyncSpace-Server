@@ -78,7 +78,7 @@ class PasswordItem
     {
         $this->createdAt = new \DateTimeImmutable();
     }
-    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -191,8 +191,8 @@ class PasswordItem
     public function setPasswordEncrypted(string $password, string $encryptionKey): static
     {
         $iv = random_bytes(12); // Génère un IV aléatoire de 12 octets
-        $ciphertext = openssl_encrypt($password, "aes-256-gcm", $encryptionKey, 0, $iv, $tag);
-        $this->passwordEncrypted = base64_encode($ciphertext . "::" . $tag);
+        $ciphertext = openssl_encrypt($password, 'aes-256-gcm', $encryptionKey, 0, $iv, $tag);
+        $this->passwordEncrypted = base64_encode($ciphertext.'::'.$tag);
         $this->iv = base64_encode($iv);
 
         return $this;
@@ -200,9 +200,10 @@ class PasswordItem
 
     public function decryptPassword(string $encryptionKey): ?string
     {
-        $data = explode("::", base64_decode($this->passwordEncrypted));
+        $data = explode('::', base64_decode($this->passwordEncrypted));
         $iv = base64_decode($this->iv);
-        return openssl_decrypt($data[0], "aes-256-gcm", $encryptionKey, 0, $iv, $data[1]);
+
+        return openssl_decrypt($data[0], 'aes-256-gcm', $encryptionKey, 0, $iv, $data[1]);
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable

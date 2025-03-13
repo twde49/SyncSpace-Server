@@ -17,22 +17,21 @@ class NotificationRepository extends ServiceEntityRepository
         parent::__construct($registry, Notification::class);
     }
 
-        /**
-         * @return Notification[] Returns an array of Notification objects
-         * @param User $user
-         */
-        public function getUnreadNotifications(User $user): array
-        {
-            return $this->createQueryBuilder('n')
-                ->andWhere('n.isRead = :val')
-                ->andWhere('n.relatedTo = :user')
-                ->setParameter('val', false)
-                ->setParameter('user', $user)
-                ->orderBy('n.id', 'DESC')
-                ->getQuery()
-                ->getResult()
-            ;
-        }
+    /**
+     * @return Notification[] Returns an array of Notification objects
+     */
+    public function getUnreadNotifications(User $user): array
+    {
+        return $this->createQueryBuilder('n')
+            ->andWhere('n.isRead = :val')
+            ->andWhere('n.relatedTo = :user')
+            ->setParameter('val', false)
+            ->setParameter('user', $user)
+            ->orderBy('n.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     //    public function findOneBySomeField($value): ?Notification
     //    {

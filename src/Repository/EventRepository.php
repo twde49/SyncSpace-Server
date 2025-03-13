@@ -17,23 +17,23 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-        /**
-         * @return Event[] Returns an array of Event objects
-         */
-        public function getAllEventsWhereUserIsIn(User $user): array
-        {
-            $conn = $this->getEntityManager()->getConnection();
-            
-            $sql = '
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function getAllEventsWhereUserIsIn(User $user): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
                 SELECT * FROM event
                 WHERE event.organizer_id = :user_id
                 AND event.id in (SELECT event_id FROM event_user WHERE user_id = :user_id)
                 ';
-    
-            $resultSet = $conn->executeQuery($sql, ['user_id' => $user->getId()]);
-    
-            return $resultSet->fetchAllAssociative();
-        }
+
+        $resultSet = $conn->executeQuery($sql, ['user_id' => $user->getId()]);
+
+        return $resultSet->fetchAllAssociative();
+    }
 
     //    public function findOneBySomeField($value): ?Event
     //    {

@@ -14,55 +14,55 @@ class Conversation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?string $type = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'conversations')]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private Collection $users;
 
     /**
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private Collection $messages;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?User $createdBy = null;
 
     #[ORM\Column]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?\DateTimeImmutable $lastActivity = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?string $avatar = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?User $lastActiveUser = null;
 
     #[ORM\OneToOne(cascade: ['persist'])]
-    #[Groups("conversation:read")]
+    #[Groups('conversation:read')]
     private ?Message $lastMessage = null;
 
     public function __construct()

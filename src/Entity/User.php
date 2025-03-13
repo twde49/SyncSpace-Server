@@ -17,15 +17,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
+    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
+    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
     private ?string $email = null;
 
     /**
@@ -53,11 +52,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
+    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
+    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
     private ?string $lastName = null;
 
     /**
@@ -106,7 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $eventsAsParticipant;
 
     #[ORM\Column]
-    #[Groups(["conversation:read","user:read",'notification:read','event:read'])]
+    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
     private ?bool $isOnline = null;
 
     public function __construct()
@@ -275,7 +274,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
-        
+
         return $this;
     }
 
@@ -395,12 +394,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[Groups(["user:read"])]
+    #[Groups(['user:read'])]
     public function isMasterPasswordSet(): bool
     {
         return !empty($this->masterPassword);
     }
-    
+
     public function getMasterPasswordHash(): ?string
     {
         return $this->masterPasswordHash;
@@ -408,17 +407,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setMasterPasswordHash(string $password): self
     {
-        $salt = "syncspace_salt";
-        $hash = hash_pbkdf2("sha256", $password, $salt, 100000, 64);
+        $salt = 'syncspace_salt';
+        $hash = hash_pbkdf2('sha256', $password, $salt, 100000, 64);
         $this->masterPasswordHash = $hash;
-        
+
         return $this;
     }
-    
+
     public function verifyMasterPassword(string $password): bool
     {
-        $salt = "syncspace_salt";
-        return hash_pbkdf2("sha256", $password, $salt, 100000, 64) === $this->masterPasswordHash;
+        $salt = 'syncspace_salt';
+
+        return hash_pbkdf2('sha256', $password, $salt, 100000, 64) === $this->masterPasswordHash;
     }
 
     /**

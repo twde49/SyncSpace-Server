@@ -41,7 +41,7 @@ class Notification
         $this->createdAt = new \DateTimeImmutable();
         $this->isRead = false;
     }
-    
+
     public function getId(): ?int
     {
         return $this->id;
