@@ -1,15 +1,17 @@
 <?php
+
 namespace App\Service;
+
 use App\Entity\Notification;
 use App\Entity\User;
-use GuzzleHttp\Client;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Client;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class NotificationService {
-
+class NotificationService
+{
     private $params;
     private $normalizer;
     private $notificationRepository;
@@ -31,15 +33,14 @@ class NotificationService {
         $notification->setRelatedTo($toUser);
         $this->manager->persist($notification);
         $this->manager->flush();
-        
+
         $client = new Client();
         $context = ['groups' => 'notification:read'];
         $normalizedNotification = $this->normalizer->normalize($notification, null, $context);
 
         $websocketbaseurl = $this->params->get('websocket_url');
-        $client->post($websocketbaseurl . "/webhook/send-notification", [
-            'json' => ['notification' => $normalizedNotification, 'user_email' => $toUser->getEmail()]
+        $client->post($websocketbaseurl.'/webhook/send-notification', [
+            'json' => ['notification' => $normalizedNotification, 'user_email' => $toUser->getEmail()],
         ]);
-        
     }
 }

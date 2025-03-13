@@ -42,27 +42,24 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form,
         ]);
     }
-    
-    #[Route('/api/register', methods: "POST")]
-    public function registerApi(SerializerInterface $serializer,Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $manager): Response
-    {
 
-        $user = $serializer->deserialize($request->getContent(), User::class, "json");
+    #[Route('/api/register', methods: 'POST')]
+    public function registerApi(SerializerInterface $serializer, Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $manager): Response
+    {
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
         $parameters = json_decode($request->getContent(), true);
 
         $user->setPassword(
             $userPasswordHasher->hashPassword(
                 $user,
-                $parameters["password"]
+                $parameters['password']
             )
         );
-
 
         $manager->persist($user);
         $manager->flush();
 
-        return $this->json("L'utilisateur a bien été créé", 200, [], ["groups" => "forCreation"]);
-
+        return $this->json("L'utilisateur a bien été créé", 200, [], ['groups' => 'forCreation']);
     }
 }

@@ -6,8 +6,8 @@ use App\Repository\FileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
@@ -43,7 +43,7 @@ class File
     #[ORM\ManyToOne(inversedBy: 'files')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['file:read'])]
-    private ?User $owner = null; 
+    private ?User $owner = null;
 
     /**
      * @var Collection<int, User>
@@ -56,18 +56,18 @@ class File
     #[Groups(['file:read'])]
     private ?string $originalName = null;
 
-    #[Vich\UploadableField(mapping: "files", fileNameProperty: "filename")]
+    #[Vich\UploadableField(mapping: 'files', fileNameProperty: 'filename')]
     private ?SymfonyFile $file = null;
 
-    #[ORM\Column(options: ["default" => false])]
+    #[ORM\Column(options: ['default' => false])]
     #[Groups(['file:read'])]
     private ?bool $isFolder = false;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: "children")]
-    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?self $parent = null;
-    
-    #[ORM\OneToMany(mappedBy: "parent", targetEntity: self::class, cascade: ["remove"])]
+
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, cascade: ['remove'])]
     #[Groups(['file:read'])]
     private $children;
 
@@ -91,7 +91,8 @@ class File
     public function setFilename(?string $filename): static
     {
         $this->filename = $filename;
-        $this->setFilepath('/uploads/files/' . $filename);
+        $this->setFilepath('/uploads/files/'.$filename);
+
         return $this;
     }
 
@@ -105,6 +106,7 @@ class File
         if (!$this->isFolder) {
             $this->filepath = $filepath;
         }
+
         return $this;
     }
 
@@ -118,6 +120,7 @@ class File
         if (!$this->isFolder) {
             $this->size = $size;
         }
+
         return $this;
     }
 
@@ -129,6 +132,7 @@ class File
     public function setMimeType(string $mimeType): static
     {
         $this->mimeType = $mimeType;
+
         return $this;
     }
 
@@ -140,6 +144,7 @@ class File
     public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
     {
         $this->uploadedAt = $uploadedAt;
+
         return $this;
     }
 
@@ -151,6 +156,7 @@ class File
     public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
+
         return $this;
     }
 
@@ -167,12 +173,14 @@ class File
         if (!$this->sharedWith->contains($sharedWith)) {
             $this->sharedWith->add($sharedWith);
         }
+
         return $this;
     }
 
     public function revokeAccess(User $sharedWith): static
     {
         $this->sharedWith->removeElement($sharedWith);
+
         return $this;
     }
 
@@ -184,6 +192,7 @@ class File
     public function setOriginalName(string $originalName): static
     {
         $this->originalName = $originalName;
+
         return $this;
     }
 
@@ -225,7 +234,7 @@ class File
 
         return $this;
     }
-    
+
     /**
      * @return Collection<int, File>
      */
@@ -233,20 +242,22 @@ class File
     {
         return $this->children;
     }
-    
+
     public function addChild(File $child): static
     {
         if (!$this->children->contains($child)) {
             $this->children->add($child);
         }
+
         return $this;
     }
-    
+
     public function removeChild(File $child): static
     {
         if ($this->children->contains($child)) {
             $this->children->removeElement($child);
         }
+
         return $this;
     }
 }
