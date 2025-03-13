@@ -98,4 +98,16 @@ class PasswordItemController extends AbstractController
             'hash' => $user->getMasterPasswordHash() ?? null,
         ]);
     }
+    
+    #[Route('/count', methods: ['GET'])]
+    public function howManyPasswords(): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->json([
+            'passwordCount' => $user->getPasswordItems()->count(),
+            'compromisedPasswordCount' => $user->getPasswordItems()->filter(fn($item) => $item->mustBeUpdated())->count(),
+        ]);
+    }
 }

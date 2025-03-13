@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,9 +25,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ChatUserModuleController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    private ParameterBagInterface $params;
+    
+    public function __construct(EntityManagerInterface $entityManager, ParameterBagInterface $params)
     {
+        $this->params = $params;
         $this->entityManager = $entityManager;
     }
 
@@ -49,6 +52,11 @@ class ChatUserModuleController extends AbstractController
     ): Response {
         $data = $request->toArray();
         $userIds = $data['userIds'] ?? [];
+        /* @var User $user */
+        $user = $this->getUser();
+        
+        $conversationRepository->checkIfAlreadyExists($userIds, $user->getId());
+        
         $conversation = new Conversation();
         $conversation->setCreatedBy($this->getUser());
         $conversation->addUser($this->getUser());
@@ -186,7 +194,7 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->flush();
 
         $client = new Client();
-        $client->request('POST', 'http://localhost:6969/webhook/refreshConversations');
+        $client->request('POST', $this->params->get('websocket_url'). '/webhook/refreshConversations');
 
         return $this->json(['message' => 'Conversation deleted'], 200);
     }
@@ -265,17 +273,15 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->flush();
 
         $client = new Client();
-        $messages = $messageRepository->findBy([
-            'conversation' => $conversation,
-        ]);
+        
         $context = ['groups' => 'conversation:read'];
-        $jsonMessages = $serializer->serialize($messages, 'json', $context);
-
-        $client->post('http://localhost:6969/webhook/update-messages', [
-            'json' => ['messages' => $jsonMessages],
+        $jsonMessage = $serializer->serialize($message, 'json', $context);
+        
+        $client->post($this->params->get('websocket_url'). '/webhook/newMessage', [
+            'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
         ]);
-
-        $client->post('http://localhost:6969/webhook/refreshConversations');
+        
+        $client->post($this->params->get('websocket_url'). '/webhook/refreshConversations');
 
         foreach ($conversation->getUsers() as $user) {
             if ($user !== $currentUser) {
@@ -366,11 +372,11 @@ class ChatUserModuleController extends AbstractController
         $context = ['groups' => 'conversation:read'];
         $jsonMessages = $serializer->serialize($messages, 'json', $context);
 
-        $client->post('http://localhost:6969/webhook/update-messages', [
+        $client->post($this->params->get('websocket_url'). '/webhook/update-messages', [
             'json' => ['messages' => $jsonMessages],
         ]);
 
-        $client->post('http://localhost:6969/webhook/refreshConversations');
+        $client->post($this->params->get('websocket_url'). '/webhook/refreshConversations');
 
         return $this->json(['message' => 'Message updated'], 200);
     }

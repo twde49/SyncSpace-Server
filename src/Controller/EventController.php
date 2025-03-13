@@ -9,6 +9,7 @@ use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,6 +18,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/events')]
 class EventController extends AbstractController
 {
+    
+    private ParameterBagInterface $params;
+    
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->params = $params;
+    }
+    
     #[Route('/all', name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
@@ -50,7 +59,7 @@ class EventController extends AbstractController
 
         $client = new Client();
 
-        $client->post('http://localhost:6969/webhook/refreshCalendar');
+        $client->post($this->params->get('websocket_url'). '/webhook/refreshCalendar');
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
