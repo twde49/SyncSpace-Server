@@ -108,6 +108,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
     private ?bool $isOnline = null;
 
+    #[ORM\OneToOne(mappedBy: 'relatedTo', cascade: ['persist', 'remove'])]
+    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    private ?UserSettings $userSettings = null;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -516,6 +520,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setOnline(bool $isOnline): static
     {
         $this->isOnline = $isOnline;
+
+        return $this;
+    }
+
+    public function getUserSettings(): ?UserSettings
+    {
+        return $this->userSettings;
+    }
+
+    public function setUserSettings(UserSettings $userSettings): static
+    {
+        // set the owning side of the relation if necessary
+        if ($userSettings->getRelatedTo() !== $this) {
+            $userSettings->setRelatedTo($this);
+        }
+
+        $this->userSettings = $userSettings;
 
         return $this;
     }

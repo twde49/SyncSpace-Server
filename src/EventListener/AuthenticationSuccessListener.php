@@ -20,6 +20,11 @@ class AuthenticationSuccessListener
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'userEmail' => $user->getEmail(),
+            'parameters' => [
+                'theme' => $user->getUserSettings()->getTheme(),
+                'modulesLayout' => $user->getUserSettings()->getModulesLayout(),
+                'notificationsEnabled' => $user->getUserSettings()->isNotificationsEnabled()
+            ]
         ];
 
         $event->setData($data);
