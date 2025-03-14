@@ -24,31 +24,23 @@ class ConversationRepository extends ServiceEntityRepository
          *
          * @return Conversation[] Returns an array of Conversation objects.
          */
-        public function checkIfAlreadyExists(
-            array $userIds,
-            int $currentUserId
-        ): array {
-            $queryBuilder = $this->createQueryBuilder("c");
+        public function checkIfAlreadyExists(array $userIds, int $currentUserId): array
+        {
+            $allUserIds = array_merge($userIds, [$currentUserId]);
+            sort($allUserIds);
 
-            $queryBuilder->join("c.users", "u");
-
-            $queryBuilder
-                ->andWhere(":currentUserId MEMBER OF c.users")
-                ->setParameter("currentUserId", $currentUserId);
-
-            $queryBuilder
-                ->andWhere($queryBuilder->expr()->in("u.id", ":userIds"))
-                ->setParameter("userIds", $userIds);
-
-            $queryBuilder
-                ->groupBy("c.id")
-                ->having("COUNT(DISTINCT u.id) = :userCount")
-                ->setParameter("userCount", count($userIds));
-
-            $queryBuilder->orderBy("c.id", "ASC")->setMaxResults(10);
+            $queryBuilder = $this->createQueryBuilder('c')
+                ->join('c.users', 'uAll')
+                ->join('c.users', 'uMatch', 'WITH', 'uMatch.id IN (:userIds)')
+                ->groupBy('c.id')
+                ->having('COUNT(DISTINCT uAll.id) = :userCount')
+                ->andHaving('COUNT(DISTINCT uMatch.id) = :userCount')
+                ->setParameter('userIds', $allUserIds)
+                ->setParameter('userCount', count($allUserIds));
 
             return $queryBuilder->getQuery()->getResult();
         }
+
 
     //    public function findOneBySomeField($value): ?Conversation
     //    {
