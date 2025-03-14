@@ -55,8 +55,12 @@ class ChatUserModuleController extends AbstractController
         /* @var User $user */
         $user = $this->getUser();
         
-        $conversationRepository->checkIfAlreadyExists($userIds, $user->getId());
-        
+        if ($conversationRepository->checkIfAlreadyExists($userIds, $user->getId())) {
+            return $this->json(
+                ['error' => 'conversation already exists'],
+                400
+            );
+        }
         $conversation = new Conversation();
         $conversation->setCreatedBy($this->getUser());
         $conversation->addUser($this->getUser());
