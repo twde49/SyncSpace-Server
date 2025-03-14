@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\UserSettings;
 use App\Form\RegistrationFormType;
 use App\Security\SecurityAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,7 +50,10 @@ class RegistrationController extends AbstractController
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
         $parameters = json_decode($request->getContent(), true);
-
+        
+        $userSettings = new UserSettings();
+        
+        $user->setUserSettings($userSettings);
         $user->setPassword(
             $userPasswordHasher->hashPassword(
                 $user,
