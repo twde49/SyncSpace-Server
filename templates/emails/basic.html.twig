@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code de Vérification</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f7f3ed;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f7f3ed;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            color: #54494b;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .content {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .description {
+            color: #54494b;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        
+        .code-container {
+            background-color: #ffffff;
+            border: 3px solid #f78764;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .code-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #54494b;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .code-label {
+            color: #8789c0;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            color: #54494b;
+            font-size: 14px;
+            margin-top: 30px;
+            line-height: 1.4;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #a06cd5;
+        }
+        
+        .footer-text {
+            color: #54494b;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* Styles spécifiques pour Gmail */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        td {
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7f3ed;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #f7f3ed; max-width: 600px;">
+                    <tr>
+                        <td style="padding: 30px;">
+                            
+                            <!-- Header -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 40px;">
+                                        <h1 style="color: #54494b; font-size: 28px; font-weight: bold; margin: 0; font-family: Arial, sans-serif;">
+                                            Votre Code de Vérification
+                                        </h1>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Content -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 30px;">
+                                        <p style="color: #54494b; font-size: 16px; line-height: 1.5; margin: 0; font-family: Arial, sans-serif;">
+                                            Utilisez ce code pour finaliser votre vérification :
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Code Container -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding: 20px 0;">
+                                        <table cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 3px solid #f78764; border-radius: 15px;">
+                                            <tr>
+                                                <td style="padding: 30px; text-align: center;">
+                                                    <p style="color: #8789c0; font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0 0 10px 0; font-family: Arial, sans-serif;">
+                                                        Code de vérification
+                                                    </p>
+                                                    <p style="font-size: 48px; font-weight: bold; color: #54494b; letter-spacing: 8px; font-family: 'Courier New', monospace; margin: 20px 0; text-align: center;">
+                                                        {{ code }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Instructions -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <p style="color: #54494b; font-size: 14px; line-height: 1.4; margin: 0; font-family: Arial, sans-serif;">
+                                            Ce code expire dans 10 minutes.<br>
+                                            Si vous n'avez pas demandé ce code, ignorez cet email.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Footer -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-top: 40px; border-top: 2px solid #a06cd5;">
+                                        <p style="color: #54494b; font-size: 12px; opacity: 0.7; margin: 20px 0 0 0; font-family: Arial, sans-serif;">
+                                            SyncSpace - Équipe de sécurité
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

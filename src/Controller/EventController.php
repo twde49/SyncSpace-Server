@@ -52,6 +52,7 @@ class EventController extends AbstractController
                 $newEvent->addParticipant($participant);
             }
         }
+        $newEvent->addParticipant($this->getUser());
         $newEvent->setAllDay($data['isAllDay']);
         $newEvent->setOrganizer($this->getUser());
         $manager->persist($newEvent);

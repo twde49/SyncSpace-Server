@@ -15,51 +15,56 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?bool $isAllDay = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?string $location = null;
 
-    #[ORM\ManyToOne(inversedBy: 'eventsAsOrganizer')]
+    #[ORM\ManyToOne(inversedBy: "events")]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?User $organizer = null;
 
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'eventsAsParticipant')]
-    #[Groups(['event:read'])]
+    #[
+        ORM\ManyToMany(
+            targetEntity: User::class,
+            inversedBy: "eventsAsParticipant"
+        )
+    ]
+    #[Groups(["event:read"])]
     private Collection $participants;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['event:read'])]
+    #[Groups(["event:read"])]
     private ?string $color = null;
 
     public function __construct()

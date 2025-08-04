@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -14,17 +15,36 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[
+    UniqueEntity(
+        fields: ['email'],
+        message: 'There is already an account with this email'
+    )
+]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    #[
+        Groups([
+            'conversation:read',
+            'user:read',
+            'notification:read',
+            'event:read',
+        ])
+    ]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    #[
+        Groups([
+            'conversation:read',
+            'user:read',
+            'notification:read',
+            'event:read',
+        ])
+    ]
     private ?string $email = null;
 
     /**
@@ -42,7 +62,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Message>
      */
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'sender', orphanRemoval: true)]
+    #[
+        ORM\OneToMany(
+            targetEntity: Message::class,
+            mappedBy: 'sender',
+            orphanRemoval: true
+        )
+    ]
     private Collection $messages;
 
     /**
@@ -52,29 +78,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $conversations;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    #[
+        Groups([
+            'conversation:read',
+            'user:read',
+            'notification:read',
+            'event:read',
+        ])
+    ]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    #[
+        Groups([
+            'conversation:read',
+            'user:read',
+            'notification:read',
+            'event:read',
+        ])
+    ]
     private ?string $lastName = null;
 
     /**
      * @var Collection<int, Note>
      */
-    #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'author', orphanRemoval: true)]
+    #[
+        ORM\OneToMany(
+            targetEntity: Note::class,
+            mappedBy: 'author',
+            orphanRemoval: true
+        )
+    ]
     private Collection $notes;
 
     /**
      * @var Collection<int, PasswordItem>
      */
-    #[ORM\OneToMany(targetEntity: PasswordItem::class, mappedBy: 'associatedTo', orphanRemoval: true)]
+    #[
+        ORM\OneToMany(
+            targetEntity: PasswordItem::class,
+            mappedBy: 'associatedTo',
+            orphanRemoval: true
+        )
+    ]
     private Collection $passwordItems;
 
     /**
      * @var Collection<int, File>
      */
-    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'owner', orphanRemoval: true)]
+    #[
+        ORM\OneToMany(
+            targetEntity: File::class,
+            mappedBy: 'owner',
+            orphanRemoval: true
+        )
+    ]
     private Collection $files;
 
     /**
@@ -89,13 +147,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Notification>
      */
-    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'relatedTo', orphanRemoval: true)]
+    #[
+        ORM\OneToMany(
+            targetEntity: Notification::class,
+            mappedBy: 'relatedTo',
+            orphanRemoval: true
+        )
+    ]
     private Collection $notifications;
 
     /**
      * @var Collection<int, Event>
      */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organizer', orphanRemoval: true)]
+    #[
+        ORM\OneToMany(
+            targetEntity: Event::class,
+            mappedBy: 'organizer',
+            orphanRemoval: true
+        )
+    ]
     private Collection $events;
 
     /**
@@ -105,12 +175,74 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $eventsAsParticipant;
 
     #[ORM\Column]
-    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    #[
+        Groups([
+            'conversation:read',
+            'user:read',
+            'notification:read',
+            'event:read',
+        ])
+    ]
     private ?bool $isOnline = null;
 
     #[ORM\OneToOne(mappedBy: 'relatedTo', cascade: ['persist', 'remove'])]
-    #[Groups(['conversation:read', 'user:read', 'notification:read', 'event:read'])]
+    #[
+        Groups([
+            'conversation:read',
+            'user:read',
+            'notification:read',
+            'event:read',
+        ])
+    ]
     private ?UserSettings $userSettings = null;
+
+    /**
+     * @var Collection<int, Playlist>
+     */
+    #[
+        ORM\OneToMany(
+            targetEntity: Playlist::class,
+            mappedBy: 'relatedTo',
+            orphanRemoval: true
+        )
+    ]
+    private Collection $playlists;
+
+    /**
+     * @var Collection<int, TrackHistory>
+     */
+    #[
+        ORM\OneToMany(
+            targetEntity: TrackHistory::class,
+            mappedBy: 'ofUser',
+            orphanRemoval: true
+        )
+    ]
+    private Collection $trackHistory;
+
+    /**
+     * @var Collection<int, FavoriteTrack>
+     */
+    #[
+        ORM\OneToMany(
+            targetEntity: FavoriteTrack::class,
+            mappedBy: 'relatedTo',
+            orphanRemoval: true
+        )
+    ]
+    private Collection $favoriteTracks;
+
+    #[ORM\ManyToOne(targetEntity: Track::class, inversedBy: 'usersListening')]
+    private ?Track $currentTrack = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $verificationCode = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $verificationCodeValidUntil = null;
+
+    #[ORM\Column]
+    private ?bool $isValidated = null;
 
     public function __construct()
     {
@@ -124,6 +256,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->events = new ArrayCollection();
         $this->eventsAsParticipant = new ArrayCollection();
         $this->isOnline = false;
+        $this->playlists = new ArrayCollection();
+        $this->favoriteTracks = new ArrayCollection();
+        $this->trackHistory = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -422,7 +557,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $salt = 'syncspace_salt';
 
-        return hash_pbkdf2('sha256', $password, $salt, 100000, 64) === $this->masterPasswordHash;
+        return hash_pbkdf2('sha256', $password, $salt, 100000, 64) ===
+            $this->masterPasswordHash;
     }
 
     /**
@@ -503,8 +639,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeEventsAsParticipant(Event $eventsAsParticipant): static
-    {
+    public function removeEventsAsParticipant(
+        Event $eventsAsParticipant,
+    ): static {
         if ($this->eventsAsParticipant->removeElement($eventsAsParticipant)) {
             $eventsAsParticipant->removeParticipant($this);
         }
@@ -537,6 +674,149 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->userSettings = $userSettings;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Playlist>
+     */
+    public function getPlaylists(): Collection
+    {
+        return $this->playlists;
+    }
+
+    public function addPlaylist(Playlist $playlist): static
+    {
+        if (!$this->playlists->contains($playlist)) {
+            $this->playlists->add($playlist);
+            $playlist->setRelatedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlaylist(Playlist $playlist): static
+    {
+        if ($this->playlists->removeElement($playlist)) {
+            // set the owning side to null (unless already changed)
+            if ($playlist->getRelatedTo() === $this) {
+                $playlist->setRelatedTo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TrackHistory>
+     */
+    public function getTrackHistory(): Collection
+    {
+        return $this->trackHistory;
+    }
+
+    public function addTrackHistory(TrackHistory $trackHistory): static
+    {
+        if (!$this->trackHistory->contains($trackHistory)) {
+            $this->trackHistory->add($trackHistory);
+            $trackHistory->setOfUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrackHistory(TrackHistory $trackHistory): static
+    {
+        if ($this->trackHistory->removeElement($trackHistory)) {
+            // set the owning side to null (unless already changed)
+            if ($trackHistory->getOfUser() === $this) {
+                $trackHistory->setOfUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FavoriteTrack>
+     */
+    public function getFavoriteTracks(): Collection
+    {
+        return $this->favoriteTracks;
+    }
+
+    public function getFavoriteTracksQuantity(): int
+    {
+        return $this->favoriteTracks->count();
+    }
+
+    public function addFavoriteTrack(FavoriteTrack $favoriteTrack): static
+    {
+        if (!$this->favoriteTracks->contains($favoriteTrack)) {
+            $this->favoriteTracks->add($favoriteTrack);
+            $favoriteTrack->setRelatedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteTrack(FavoriteTrack $favoriteTrack): static
+    {
+        if ($this->favoriteTracks->removeElement($favoriteTrack)) {
+            // set the owning side to null (unless already changed)
+            if ($favoriteTrack->getRelatedTo() === $this) {
+                $favoriteTrack->setRelatedTo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCurrentTrack(): ?Track
+    {
+        return $this->currentTrack;
+    }
+
+    public function setCurrentTrack(?Track $currentTrack): static
+    {
+        $this->currentTrack = $currentTrack;
+
+        return $this;
+    }
+
+    public function getVerificationCode(): ?string
+    {
+        return $this->verificationCode;
+    }
+
+    public function setVerificationCode(?string $verificationCode): static
+    {
+        $this->verificationCode = $verificationCode;
+
+        return $this;
+    }
+
+    public function getVerificationCodeValidUntil(): ?\DateTimeImmutable
+    {
+        return $this->verificationCodeValidUntil;
+    }
+
+    public function setVerificationCodeValidUntil(?\DateTimeImmutable $verificationCodeValidUntil): static
+    {
+        $this->verificationCodeValidUntil = $verificationCodeValidUntil;
+
+        return $this;
+    }
+
+    public function isValidated(): ?bool
+    {
+        return $this->isValidated;
+    }
+
+    public function setIsValidated(bool $isValidated): static
+    {
+        $this->isValidated = $isValidated;
 
         return $this;
     }

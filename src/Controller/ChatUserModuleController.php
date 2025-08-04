@@ -26,7 +26,7 @@ class ChatUserModuleController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private ParameterBagInterface $params;
-    
+
     public function __construct(EntityManagerInterface $entityManager, ParameterBagInterface $params)
     {
         $this->params = $params;
@@ -52,9 +52,9 @@ class ChatUserModuleController extends AbstractController
     ): Response {
         $data = $request->toArray();
         $userIds = $data['userIds'] ?? [];
-        /* @var User $user */
+        /** @var User $user */
         $user = $this->getUser();
-        
+
         if ($conversationRepository->checkIfAlreadyExists($userIds, $user->getId())) {
             return $this->json(
                 ['error' => 'conversation already exists'],
@@ -198,7 +198,7 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->flush();
 
         $client = new Client();
-        $client->request('POST', $this->params->get('websocket_url'). '/webhook/refreshConversations');
+        $client->request('POST', $this->params->get('websocket_url').'/webhook/refreshConversations');
 
         return $this->json(['message' => 'Conversation deleted'], 200);
     }
@@ -277,15 +277,15 @@ class ChatUserModuleController extends AbstractController
         $this->entityManager->flush();
 
         $client = new Client();
-        
+
         $context = ['groups' => 'conversation:read'];
         $jsonMessage = $serializer->serialize($message, 'json', $context);
-        
-        $client->post($this->params->get('websocket_url'). '/webhook/newMessage', [
+
+        $client->post($this->params->get('websocket_url').'/webhook/newMessage', [
             'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
         ]);
-        
-        $client->post($this->params->get('websocket_url'). '/webhook/refreshConversations');
+
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
 
         foreach ($conversation->getUsers() as $user) {
             if ($user !== $currentUser) {
@@ -376,11 +376,11 @@ class ChatUserModuleController extends AbstractController
         $context = ['groups' => 'conversation:read'];
         $jsonMessages = $serializer->serialize($messages, 'json', $context);
 
-        $client->post($this->params->get('websocket_url'). '/webhook/update-messages', [
+        $client->post($this->params->get('websocket_url').'/webhook/update-messages', [
             'json' => ['messages' => $jsonMessages],
         ]);
 
-        $client->post($this->params->get('websocket_url'). '/webhook/refreshConversations');
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
 
         return $this->json(['message' => 'Message updated'], 200);
     }
@@ -392,18 +392,12 @@ class ChatUserModuleController extends AbstractController
             methods: ['POST']
         )
     ]
-    public function searchUser(Request $request): Response
+    public function searchUser(Request $request, UserRepository $repository): Response
     {
         $data = $request->toArray();
-        $query = $this->entityManager
-            ->getRepository(User::class)
-            ->createQueryBuilder('u');
-        $query->where('LOWER(u.firstName) LIKE LOWER(:firstName)');
-        $query->setParameter(
-            'firstName',
-            '%'.strtolower($data['username']).'%'
-        );
-        $users = $query->getQuery()->getResult();
+        $username = $data['username'];
+        $users = $repository->findUserByUsername($username);
+
         $searchedResult = array_values($users);
 
         return $this->json($searchedResult, 200, [], ['groups' => 'user:read']);
