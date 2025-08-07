@@ -21,6 +21,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
         message: 'There is already an account with this email'
     )
 ]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_GOOGLEID', fields: ['googleId'])]
+#[
+    UniqueEntity(
+        fields: ['googleId'],
+        message: 'There is already an account with this Google ID'
+    )
+]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -243,6 +250,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $isValidated = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleId = null;
 
     public function __construct()
     {
@@ -817,6 +827,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsValidated(bool $isValidated): static
     {
         $this->isValidated = $isValidated;
+
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
 
         return $this;
     }

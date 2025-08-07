@@ -55,6 +55,7 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS } 
         - { path: ^/api/sendVerificationCode, roles: PUBLIC_ACCESS }
         - { path: ^/api/verifyVerificationCode, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/google, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
         - { path: ^/api/user/setOnline, roles: PUBLIC_ACCESS }
 

@@ -15,9 +15,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -307,6 +309,165 @@ class ChatUserModuleController extends AbstractController
         ];
 
         return $this->json($response);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    #[
+        Route(
+            '/conversation/{id}/message/new/audio',
+            name: 'send_audio_message_post',
+            methods: ['POST']
+        )
+    ]
+    public function sendAudioMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
+        NotificationService $notificationService, UrlGeneratorInterface $urlGenerator): Response
+    {
+        if (!$conversation) {
+            return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
+        }
+        $audioFile = $request->files->get('audio');
+        if (!$audioFile || !$audioFile->isValid()) {
+            return $this->json(['error' => 'Invalid audio file'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $newFilename = uniqid().'.'.$audioFile->guessExtension();
+        $uploadDir = sprintf('%s/public/uploads/audio/', $this->getParameter('kernel.project_dir'));
+        try {
+            $audioFile->move($uploadDir, $newFilename);
+        } catch (FileException $e) {
+            return $this->json(['error' => 'Failed to save audio file'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $publicPath = "uploads/audio/{$newFilename}";
+
+        $message = new Message();
+        $message->setConversation($conversation);
+        $message->setAttachment($newFilename);
+        $message->setContent($publicPath);
+        $message->setType('audio');
+        $message->setSentAt(new \DateTimeImmutable());
+        $message->setSender($this->getUser());
+        $conversation->setLastMessage($message);
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $client = new Client();
+
+        $context = ['groups' => 'conversation:read'];
+        $jsonMessage = $serializer->serialize($message, 'json', $context);
+
+        $client->post($this->params->get('websocket_url').'/webhook/newMessage', [
+            'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
+        ]);
+
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
+
+        foreach ($conversation->getUsers() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    'Nouveau message de '.
+                    $currentUser->getFirstName().
+                    ' '.
+                    $currentUser->getLastName(),
+                    $message->getContent(),
+                    $user
+                );
+            }
+        }
+
+        $response = [
+            'detail' => 'Your audio message has been sent',
+            'Status' => 201,
+            'content' => $message->getContent(),
+        ];
+
+        $manager->persist($message);
+        $manager->persist($conversation);
+        $manager->flush();
+
+        return $this->json($response, Response::HTTP_CREATED);
+    }
+    
+    
+    /**
+     * @throws GuzzleException
+     */
+    #[
+        Route(
+            '/conversation/{id}/message/new/media',
+            name: 'send_image_message_post',
+            methods: ['POST']
+        )
+    ]
+    public function sendImageMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
+        NotificationService $notificationService): Response
+    {
+        if (!$conversation) {
+            return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
+        }
+        $imageFile = $request->files->get('media');
+        if (!$imageFile || !$imageFile->isValid()) {
+            return $this->json(['error' => 'Invalid image file'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $newFilename = uniqid().'.'.$imageFile->guessExtension();
+        $uploadDir = sprintf('%s/public/uploads/images/', $this->getParameter('kernel.project_dir'));
+        try {
+            $imageFile->move($uploadDir, $newFilename);
+        } catch (FileException $e) {
+            return $this->json(['error' => 'Failed to save image file'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $publicPath = "uploads/images/{$newFilename}";
+
+        $message = new Message();
+        $message->setConversation($conversation);
+        $message->setAttachment($newFilename);
+        $message->setContent($publicPath);
+        $message->setType('image');
+        $message->setSentAt(new \DateTimeImmutable());
+        $message->setSender($this->getUser());
+        $conversation->setLastMessage($message);
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $client = new Client();
+
+        $context = ['groups' => 'conversation:read'];
+        $jsonMessage = $serializer->serialize($message, 'json', $context);
+
+        $client->post($this->params->get('websocket_url').'/webhook/newMessage', [
+            'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
+        ]);
+
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
+
+        foreach ($conversation->getUsers() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    'Nouveau message de '.
+                    $currentUser->getFirstName().
+                    ' '.
+                    $currentUser->getLastName(),
+                    $message->getContent(),
+                    $user
+                );
+            }
+        }
+
+        $response = [
+            'detail' => 'Your image message has been sent',
+            'Status' => 201,
+            'content' => $message->getContent(),
+        ];
+
+        $manager->persist($message);
+        $manager->persist($conversation);
+        $manager->flush();
+
+        return $this->json($response, Response::HTTP_CREATED);
     }
 
     #[
