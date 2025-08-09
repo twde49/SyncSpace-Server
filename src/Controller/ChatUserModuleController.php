@@ -389,8 +389,7 @@ class ChatUserModuleController extends AbstractController
 
         return $this->json($response, Response::HTTP_CREATED);
     }
-    
-    
+
     /**
      * @throws GuzzleException
      */
@@ -459,6 +458,78 @@ class ChatUserModuleController extends AbstractController
 
         $response = [
             'detail' => 'Your image message has been sent',
+            'Status' => 201,
+            'content' => $message->getContent(),
+        ];
+
+        $manager->persist($message);
+        $manager->persist($conversation);
+        $manager->flush();
+
+        return $this->json($response, Response::HTTP_CREATED);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    #[
+        Route(
+            '/conversation/{id}/message/new/gif',
+            name: 'send_gif_message_post',
+            methods: ['POST']
+        )
+    ]
+    public function sendGifMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
+        NotificationService $notificationService): Response
+    {
+        if (!$conversation) {
+            return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $request->toArray();
+        $gifUrl = $data['gifUrl'] ?? null;
+
+        if (empty($gifUrl)) {
+            return $this->json(['error' => 'GIF URL is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $message = new Message();
+        $message->setConversation($conversation);
+        $message->setAttachment($gifUrl);
+        $message->setContent($gifUrl);
+        $message->setType('gif');
+        $message->setSentAt(new \DateTimeImmutable());
+        $message->setSender($this->getUser());
+        $conversation->setLastMessage($message);
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $client = new Client();
+
+        $context = ['groups' => 'conversation:read'];
+        $jsonMessage = $serializer->serialize($message, 'json', $context);
+
+        $client->post($this->params->get('websocket_url').'/webhook/newMessage', [
+            'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
+        ]);
+
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
+
+        foreach ($conversation->getUsers() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    'Nouveau message de '.
+                    $currentUser->getFirstName().
+                    ' '.
+                    $currentUser->getLastName(),
+                    'GIF: '.$message->getContent(),
+                    $user
+                );
+            }
+        }
+
+        $response = [
+            'detail' => 'Your GIF message has been sent',
             'Status' => 201,
             'content' => $message->getContent(),
         ];

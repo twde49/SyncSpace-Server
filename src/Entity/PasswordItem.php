@@ -56,7 +56,7 @@ class PasswordItem
     private ?string $passwordEncrypted = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $notesEncrypted = null;
+    private ?string $notes = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $iv = null; // IV pour AES-GCM
@@ -73,6 +73,9 @@ class PasswordItem
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -120,14 +123,17 @@ class PasswordItem
         return $this;
     }
 
-    public function getNotesEncrypted(): ?string
+    public function getNotes(): ?string
     {
-        return $this->notesEncrypted;
+        return $this->notes;
     }
 
-    public function setNotesEncrypted(?string $notesEncrypted): static
+    /**
+     * @throws RandomException
+     */
+    public function setNotes(?string $notes): static
     {
-        $this->notesEncrypted = $notesEncrypted;
+        $this->notes = $notes;
 
         return $this;
     }
@@ -188,12 +194,10 @@ class PasswordItem
     /**
      * @throws RandomException
      */
-    public function setPasswordEncrypted(string $password, string $encryptionKey): static
+    public function setPasswordEncrypted(string $encryptedPasswordWithTag, string $iv): static
     {
-        $iv = random_bytes(12); // Génère un IV aléatoire de 12 octets
-        $ciphertext = openssl_encrypt($password, 'aes-256-gcm', $encryptionKey, 0, $iv, $tag);
-        $this->passwordEncrypted = base64_encode($ciphertext.'::'.$tag);
-        $this->iv = base64_encode($iv);
+        $this->passwordEncrypted = $encryptedPasswordWithTag;
+        $this->iv = $iv;
 
         return $this;
     }
@@ -214,6 +218,18 @@ class PasswordItem
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
