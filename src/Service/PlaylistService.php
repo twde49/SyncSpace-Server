@@ -17,15 +17,14 @@ class PlaylistService
     }
 
     /**
-     * @param int    $userId
+     * @param User   $user
      * @param string $name
      */
-    public function createPlaylist($userId, $name): Playlist
+    public function createPlaylist(User $user, $name): Playlist
     {
         $playlist = new Playlist();
         $playlist->setName($name);
 
-        $user = $this->em->getRepository(User::class)->find($userId);
         $playlist->setRelatedTo($user);
 
         $this->em->persist($playlist);
@@ -41,7 +40,7 @@ class PlaylistService
     public function addTrackToPlaylist($playlistId, $trackId): void
     {
         $playlist = $this->em->getRepository(Playlist::class)->find($playlistId);
-        $track = $this->em->getRepository(Track::class)->find($trackId);
+        $track = $this->em->getRepository(Track::class)->findOneBy(['youtubeId' => $trackId]);
 
         if ($playlist && $track) {
             $playlist->getTracks()->add($track);

@@ -14,11 +14,11 @@ class Playlist
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['playlistSmallRead'])]
+    #[Groups(['playlistSmallRead', 'playlist:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['playlistSmallRead'])]
+    #[Groups(['playlistSmallRead', 'playlist:read'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'playlists')]
@@ -29,6 +29,7 @@ class Playlist
      * @var Collection<int, Track>
      */
     #[ORM\ManyToMany(targetEntity: Track::class)]
+    #[Groups(['playlist:read'])]
     private Collection $tracks;
 
     public function __construct()

@@ -6,6 +6,7 @@ use App\Repository\TrackRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TrackRepository::class)]
 class Track
@@ -13,21 +14,26 @@ class Track
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['favoriteTrack:read', 'playlist:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['favoriteTrack:read', 'playlist:read'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['favoriteTrack:read', 'playlist:read'])]
     private ?string $artist = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['favoriteTrack:read', 'playlist:read'])]
     private ?string $youtubeId = null;
 
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: "currentTrack")]
     private Collection $usersListening;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['favoriteTrack:read', 'playlist:read'])]
     private ?string $coverUrl = null;
 
     public function __construct()

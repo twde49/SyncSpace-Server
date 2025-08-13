@@ -27,7 +27,7 @@ final class Version20250804095305 extends AbstractMigration
             ALTER TABLE "user" ADD verification_code_valid_until DATE DEFAULT NULL
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" ADD is_validated BOOLEAN NOT NULL DEFAULT false
+            ALTER TABLE "user" ADD is_validated BOOLEAN NOT NULL DEFAULT 0
         SQL);
         $this->addSql(<<<'SQL'
             COMMENT ON COLUMN "user".verification_code_valid_until IS '(DC2Type:datetime_immutable)'

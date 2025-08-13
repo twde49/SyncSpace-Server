@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\NotificationService;
@@ -93,4 +94,66 @@ class EventController extends AbstractController
 
         return $this->json('Successfully removed event', Response::HTTP_OK);
     }
+    
+    
+    #[Route('/update/{id}', name: 'app_event_update', methods: ['PUT'])]
+    public function updateEvent(?Event $event, Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, UserRepository $userRepository, NotificationService $notificationService): Response
+    {
+        if (!$event) {
+            return $this->json(['error' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($event->getOrganizer() !== $this->getUser()) {
+            return $this->json(['error' => 'You are not authorized to update this event'], Response::HTTP_FORBIDDEN);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $serializer->deserialize($request->getContent(), Event::class, 'json', ['object_to_populate' => $event]);
+
+        $newParticipantsToAdd = [];
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $newParticipantsToAdd[] = $currentUser;
+
+        if (isset($data['participantsIds']) && is_array($data['participantsIds'])) {
+            foreach ($data['participantsIds'] as $participantId) {
+                $participant = $userRepository->find($participantId);
+                if ($participant && $participant->getId() !== $currentUser->getId()) {
+                    $newParticipantsToAdd[] = $participant;
+                }
+            }
+        }
+
+        foreach ($event->getParticipants() as $participant) {
+            $event->removeParticipant($participant);
+        }
+
+        foreach ($newParticipantsToAdd as $participant) {
+            $event->addParticipant($participant);
+        }
+
+        if (isset($data['isAllDay'])) {
+            $event->setAllDay($data['isAllDay']);
+        }
+
+        $manager->flush();
+
+        $client = new Client();
+        $client->post($this->params->get('websocket_url'). '/webhook/refreshCalendar');
+
+        foreach ($event->getParticipants() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    'Un événement a été mis à jour par '.$currentUser->getFirstName().' '.$currentUser->getLastName(),
+                    $event->getTitle(),
+                    $user
+                );
+            }
+        }
+
+        return $this->json($event, Response::HTTP_OK, [], ['groups' => ['event:read']]);
+    }
+
 }

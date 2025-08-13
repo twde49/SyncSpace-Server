@@ -72,6 +72,7 @@ class PasswordItemController extends AbstractController
                 'iv' => $passwordItem->getIv(),
                 'isFavorite' => $passwordItem->isFavorite(),
                 'updatedAt' => $passwordItem->getUpdatedAt(),
+                'mustBeUpdated' => $passwordItem->mustBeUpdated(),
             ];
         }
 

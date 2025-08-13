@@ -74,7 +74,7 @@ final class TrackController extends AbstractController
         $currentUser = $this->getUser();
     }
 
-    #[Route("/like", name: "like_track", methods: ["POST"])]
+    #[Route('/like', name: 'like_track', methods: ['POST'])]
     public function likeTrack(
         Request $request,
         EntityManagerInterface $manager
@@ -82,51 +82,54 @@ final class TrackController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (
-            empty($data["track"]["title"]) ||
-            empty($data["track"]["youtubeId"])
+            empty($data['track']['title']) ||
+            empty($data['track']['youtubeId'])
         ) {
             return $this->json(
-                ["error" => 'The fields "title" and "youtubeId" are required.'],
+                ['error' => 'The fields "title" and "youtubeId" are required.'],
                 400
             );
         }
 
-        $trackData = $data["track"];
+        $trackData = $data['track'];
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
         $trackRepository = $manager->getRepository(Track::class);
         $track = $trackRepository->findOneBy([
-            "youtubeId" => $trackData["youtubeId"],
+            'youtubeId' => $trackData['youtubeId'],
         ]);
 
         if (!$track) {
             $track = new Track();
-            $track->setTitle($trackData["title"]);
-            $track->setArtist($trackData["artist"] ?? null);
-            $track->setYoutubeId($trackData["youtubeId"]);
-            $track->setCoverUrl($trackData["coverUrl"] ?? null);
+            $track->setTitle($trackData['title']);
+            $track->setArtist($trackData['artist'] ?? null);
+            $track->setYoutubeId($trackData['youtubeId']);
+            $track->setCoverUrl($trackData['coverUrl'] ?? null);
 
             $manager->persist($track);
         }
 
         foreach ($currentUser->getFavoriteTracks() as $favoriteTrack) {
-            if ($favoriteTrack->getTracks()->contains($track)) {
+            if ($favoriteTrack->getTrack() && $favoriteTrack->getTrack()->getId() === $track->getId()) {
+                $manager->remove($favoriteTrack);
+                $manager->flush();
+
                 return $this->json(
-                    [["message" => "Track is already in your favorites"]],
-                    400
+                    ['message' => 'Track removed from your favorites'],
+                    200
                 );
             }
         }
 
         $favoriteTrack = new FavoriteTrack();
         $favoriteTrack->setRelatedTo($currentUser);
-        $favoriteTrack->addTrack($track);
+        $favoriteTrack->setTrack($track);
 
         $manager->persist($favoriteTrack);
         $manager->flush();
 
-        return $this->json([["message" => "Track liked successfully"]]);
+        return $this->json(['message' => 'Track liked successfully']);
     }
 }

@@ -119,7 +119,7 @@ final class Version20250804115216 extends AbstractMigration
             ALTER TABLE "user" ALTER verification_code_valid_until TYPE DATE
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" ALTER is_validated SET DEFAULT false
+        ALTER TABLE "user" ALTER is_validated SET DEFAULT 0
         SQL);
         $this->addSql(<<<'SQL'
             COMMENT ON COLUMN "user".verification_code_valid_until IS '(DC2Type:date_immutable)'

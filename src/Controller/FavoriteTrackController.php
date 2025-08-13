@@ -13,14 +13,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/music/favorites')]
 class FavoriteTrackController extends AbstractController
 {
-    #[Route('', name: 'app_favorites_list', methods: ['GET'])]
+    #[Route('/index', name: 'app_favorites_list', methods: ['GET'])]
     public function list(FavoriteTrackService $service): Response
     {
         /** @var User $user */
         $user = $this->getUser();
-        $favorites = $service->getFavoritesByUser($user);
+        $favorites = $user->getFavoriteTracks();
 
-        return $this->json($favorites?->getTracks() ?? []);
+        return $this->json($favorites, Response::HTTP_OK, [], ['groups' => 'favoriteTrack:read']);
     }
 
     #[Route('/add/{trackId}', name: 'app_favorites_add', methods: ['POST'])]
@@ -28,7 +28,7 @@ class FavoriteTrackController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $service->addTrackToFavorites($user, $trackId);
+        $service->updateFavorite($user, $trackId);
 
         return $this->json(['status' => 'track added']);
     }
@@ -38,7 +38,7 @@ class FavoriteTrackController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $service->removeTrackFromFavorites($user, $trackId);
+        $service->updateFavorite($user, $trackId);
 
         return $this->json(['status' => 'track removed']);
     }
@@ -52,20 +52,20 @@ class FavoriteTrackController extends AbstractController
 
         return $this->json(['quantity' => $quantity]);
     }
-    
+
     #[Route('/isFavorite', name: 'app_favorites_is_favorite', methods: ['POST'])]
     public function checkTrack(Request $request): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $trackId = $request->query->get('videoId');
-        
+
         /** @var array<FavoriteTrack> $favoriteTracksCollection */
         $favoriteTracksCollection = $user->getFavoriteTracks();
         $isFavorite = false;
 
-        foreach ($favoriteTracksCollection->getTracks() as $track) {
-            if ($track && $track->getYoutubeId() === $trackId) {
+        foreach ($favoriteTracksCollection as $track) {
+            if ($track && $track->getTrack()->getYoutubeId() === $trackId) {
                 $isFavorite = true;
                 break;
             }

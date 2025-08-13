@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\FavoriteTrackRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: FavoriteTrackRepository::class)]
 class FavoriteTrack
@@ -13,21 +13,20 @@ class FavoriteTrack
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['favoriteTrack:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: "favoriteTracks")]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $relatedTo = null;
 
-    /**
-     * @var Collection<int, Track>
-     */
-    #[ORM\ManyToMany(targetEntity: Track::class, cascade: ["persist"])]
-    private Collection $tracks;
+    #[ORM\ManyToOne(targetEntity: Track::class, cascade: ["persist"])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['favoriteTrack:read'])]
+    private ?Track $track = null;
 
     public function __construct()
     {
-        $this->tracks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -47,26 +46,15 @@ class FavoriteTrack
         return $this;
     }
 
-    /**
-     * @return Collection<int, Track>
-     */
-    public function getTracks(): Collection
+
+    public function getTrack(): ?Track
     {
-        return $this->tracks;
+        return $this->track;
     }
 
-    public function addTrack(Track $track): static
+    public function setTrack(Track $track): static
     {
-        if (!$this->tracks->contains($track)) {
-            $this->tracks->add($track);
-        }
-
-        return $this;
-    }
-
-    public function removeTrack(Track $track): static
-    {
-        $this->tracks->removeElement($track);
+        $this->track = $track;
 
         return $this;
     }

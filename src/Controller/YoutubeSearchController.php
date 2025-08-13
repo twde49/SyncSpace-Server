@@ -20,7 +20,6 @@ class YoutubeSearchController extends AbstractController
         if (!$query) {
             return $this->json(['error' => 'Missing query'], 400);
         }
-        $favoriteTracks = $favoriteTrackService->getFavoritesByUser($this->getUser());
 
         $results = $youtubeService->search($query);
 

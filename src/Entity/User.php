@@ -213,6 +213,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             orphanRemoval: true
         )
     ]
+    #[Groups(['playlist:read'])]
     private Collection $playlists;
 
     /**
@@ -237,6 +238,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             orphanRemoval: true
         )
     ]
+    #[Groups(['favoriteTrack:read', 'user:read'])]
     private Collection $favoriteTracks;
 
     #[ORM\ManyToOne(targetEntity: Track::class, inversedBy: 'usersListening')]
