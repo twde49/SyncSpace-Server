@@ -106,7 +106,7 @@ jobs:
           DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
       - name: Security Check
-        run: symfony security:check
+        run: php bin/console security:check
       
       - name: Upload coverage to Codecov
         if: matrix.php-version == '8.4'
