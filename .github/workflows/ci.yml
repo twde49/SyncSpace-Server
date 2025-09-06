@@ -89,6 +89,13 @@ jobs:
       - name: PHP CS Fixer (dry-run)
         run: vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --diff --verbose
       
+      - name: Rector (dry-run)
+        run: vendor/bin/rector process --dry-run --diff
+      
+      - name: Rector auto-fix
+        if: failure()
+        run: vendor/bin/rector process
+
       - name: PHPStan
         run: vendor/bin/phpstan analyse --memory-limit=512M
 
