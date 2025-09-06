@@ -2,11 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Conversation;
+use App\Entity\Message;
 use App\Entity\Note;
 use App\Entity\User;
 use App\Repository\NoteRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +21,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('api/note')]
 class NoteController extends AbstractController
 {
+    
+    private ParameterBagInterface $params;
+    
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->params = $params;
+    }
+    
     /**
      * Retrieves a list of notes associated with the current user, sorted in ascending order.
      *
@@ -36,6 +50,15 @@ class NoteController extends AbstractController
         $user = $this->getUser();
 
         return $this->json($repository->findNotesAscOrderByUser($user), Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
+    }
+
+    #[Route('s/shared', name: 'shared_index_note', methods: 'GET')]
+    public function indexSharedNotes(NoteRepository $repository): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->json($user->getSharedNotes(), Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
     }
 
     /**
@@ -115,5 +138,83 @@ class NoteController extends AbstractController
         $manager->flush();
 
         return $this->json('Note have been deleted');
+    }
+
+    #[Route('/share/{id}', name: 'share_note', methods: 'POST')]
+    public function shareNote(Note $note, Request $request, UserRepository $userRepository, EntityManagerInterface $manager): Response
+    {
+        $data = $request->toArray();
+        $userIds = $data['userIds'] ?? [];
+
+        foreach ($userIds as $userId) {
+            $user = $userRepository->find($userId);
+            if ($user) {
+                $note->addSharedWith($user);
+            }
+        }
+        $manager->persist($note);
+        $manager->flush();
+
+        return $this->json($note, Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
+    }
+
+    #[Route('/new/share/{id}', name: 'create_shared_note', methods: 'POST')]
+    public function createNewSharedNote(Conversation $conversation,Request $request, UserRepository $userRepository, EntityManagerInterface $manager, SerializerInterface $serializer, NotificationService $notificationService): Response
+    {
+        $data = $request->toArray();
+        $title = $data['title'] ?? '';
+        $userIds = $data['userIds'] ?? [];
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        $note = new Note();
+        $note->setTitle($title);
+        $note->setAuthor($currentUser);
+        $note->setContent('');
+
+        $message = new Message();
+        $message->setSender($currentUser);
+        $message->setContent($title);
+        $message->setSentAt(new \DateTimeImmutable());
+        $message->setConversation($conversation);
+        $message->setType('note');
+
+        foreach ($userIds as $userId) {
+            $user = $userRepository->find($userId);
+            if ($user !== $currentUser) {
+                $note->addSharedWith($user);
+            }
+        }
+
+        $manager->persist($note);
+        $manager->persist($message);
+        $manager->flush();
+        
+        $client = new Client();
+
+        $context = ['groups' => 'conversation:read'];
+        $jsonMessage = $serializer->serialize($message, 'json', $context);
+
+        $client->post($this->params->get('websocket_url').'/webhook/newMessage', [
+            'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
+        ]);
+
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
+
+        foreach ($conversation->getUsers() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    'Nouveau message de '.
+                    $currentUser->getFirstName().
+                    ' '.
+                    $currentUser->getLastName(),
+                    $message->getContent(),
+                    $user
+                );
+            }
+        }
+
+        return $this->json($note, Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
     }
 }

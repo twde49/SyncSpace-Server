@@ -3,81 +3,954 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Documentation</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Documentation API | SyncSpace</title>
+    <link rel="stylesheet" href="/styles/doc.css">
 </head>
 <body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+        <h1>Documentation API SyncSpace</h1>
+    </header>
+
     <div class="container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <h1>API Documentation</h1>
-            <nav>
-                <ul>
-                    <li><a href="#get-started">Get Started</a></li>
-                    <li><a href="#auth">Authentication</a></li>
-                    <li><a href="#endpoints">Endpoints</a></li>
-                </ul>
-            </nav>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-inner">
+                <div class="sidebar-title">Navigation</div>
+                <nav>
+                    <ul>
+                        <li><a href="#get-started">Démarrage</a></li>
+                        <li><a href="#auth">Authentification</a></li>
+                        <li><a href="#conversation">Conversations</a></li>
+                        <li><a href="#user">Utilisateurs</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#events">Événements</a></li>
+                        <li><a href="#music">Musique</a></li>
+                        <li><a href="#files">Fichiers</a></li>
+                        <li><a href="#authentication">Connexion</a></li>
+                        <li><a href="#email">Email</a></li>
+                        <li><a href="#notes">Notes</a></li>
+                        <li><a href="#notifications">Notifications</a></li>
+                        <li><a href="#passwords">Mots de passe</a></li>
+                        <li><a href="#recommendations">Recommandations</a></li>
+                        <li><a href="#track">Pistes</a></li>
+                        <li><a href="#settings">Paramètres</a></li>
+                    </ul>
+                </nav>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="content">
-            <!-- Header -->
-            <header>
-                <h2>Welcome to the API Documentation</h2>
-                <p>Your one-stop guide to integrating with our API.</p>
-            </header>
+            <div class="content-inner">
+                <!-- Header -->
+                <header class="page-header">
+                    <h2>Bienvenue sur l'API SyncSpace</h2>
+                    <p>Tout ce qu'il faut pour intégrer notre plateforme. Accédez aux conversations, fichiers, musiques et plus.</p>
+                </header>
 
-            <!-- Sections -->
-            <section id="get-started">
-                <h3>Getting Started</h3>
-                <p>Follow these steps to start using our API quickly.</p>
-            </section>
+                <!-- Sections -->
+                <section id="get-started">
+                    <h3>Démarrage</h3>
+                    <p>Cette section sera disponible bientôt.</p>
+                    <p>Toutes les réponses sont au format JSON sauf indication contraire.</p>
+                </section>
 
-            <section id="auth">
-                <h3>Authentication</h3>
-                <p>All endpoints require authentication. Include the following headers:</p>
-                <pre class="json-block">{
-    "Authorization": "Bearer YOUR_API_KEY"
-}</pre>
-            </section>
+                <section id="auth">
+                    <h3>Authentification</h3>
+                    <p>Tous les endpoints nécessitent une authentification. Incluez cet en-tête avec chaque requête:</p>
+                    <pre class="json-block"><code>{
+    "Authorization": "Bearer VOTRE_CLE_API"
+}</code><button class="copy-btn">Copier</button></pre>
+                </section>
 
-            <section id="endpoints">
-                <h3>Endpoints</h3>
+                <section id="endpoints">
+                    <h3>Points d'accès</h3>
 
-                <!-- GET Endpoint -->
-                <div class="endpoint get">
-                    <strong>GET</strong> /api/v1/resource
-                    <p>Retrieve a list of resources.</p>
-                </div>
+                    <!-- Conversation Endpoints -->
+                    <div id="conversation" class="endpoints-group">
+                        <h4>Conversations</h4>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/conversation/new</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Create a new conversation.</p>
+                                <pre class="json-block"><code>{
+    "userIds": [1, 2, 3],
+    "name": "My Conversation",
+    "avatar": "https://example.com/avatar.png"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/conversation/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Show a conversation.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/conversations</span>
+                            </div>
+                            <div class="endpoint-content"><p>Show all conversations.</p></div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/conversation/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove a conversation.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/conversation/edit/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Edit a conversation.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/conversation/{id}/message/new</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Envoyer un message.</p>
+                                <pre class="json-block"><code>{
+    "content": "Hello, world!",
+    "type": "text",
+    "attachment": ""
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/conversation/{id}/message/new/audio</span>
+                            </div>
+                            <div class="endpoint-content"><p>Send an audio message (multipart/form-data with 'audio' file).</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/conversation/{id}/message/new/media</span>
+                            </div>
+                            <div class="endpoint-content"><p>Send an image message (multipart/form-data with 'media' file).</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/conversation/{id}/message/new/gif</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Envoyer un message GIF.</p>
+                                <pre class="json-block"><code>{
+    "gifUrl": "https://example.com/my.gif"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/conversation/message/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove a message.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/conversation/message/edit/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Edit a message.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/conversation/user/search</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Rechercher un utilisateur.</p>
+                                <pre class="json-block"><code>{
+    "username": "john.doe"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- POST Endpoint -->
-                <div class="endpoint post">
-                    <strong>POST</strong> /api/v1/resource
-                    <p>Create a new resource. Example body:</p>
-                    <pre class="json-block">{
-    "name": "Resource Name",
-    "description": "Resource Description"
-}</pre>
-                </div>
+                    <!-- User Endpoints -->
+                    <div id="user" class="endpoints-group">
+                        <h4>Utilisateurs</h4>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/user/setOnline/{email}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Set user online.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/user/setOffline/{email}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Set user offline.</p></div>
+                        </div>
+                    </div>
 
-                <!-- PUT Endpoint -->
-                <div class="endpoint put">
-                    <strong>PUT</strong> /api/v1/resource/:id
-                    <p>Update an existing resource. Example body:</p>
-                    <pre class="json-block">{
-    "name": "Updated Resource Name",
-    "description": "Updated Resource Description"
-}</pre>
-                </div>
+                    <!-- Contact Endpoints -->
+                    <div id="contact" class="endpoints-group">
+                        <h4>Contact</h4>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/contact/</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Formulaire de contact.</p>
+                                <pre class="json-block"><code>{
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "message": "Hello, I have a question."
+}</code><button class="copy-btn">Copy</button></pre>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- DELETE Endpoint -->
-                <div class="endpoint delete">
-                    <strong>DELETE</strong> /api/v1/resource/:id
-                    <p>Delete a resource by its ID.</p>
-                </div>
-            </section>
+                    <!-- Event Endpoints -->
+                    <div id="events" class="endpoints-group">
+                        <h4>Événements</h4>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/events/all</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get all events.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/events/create</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Créer un événement.</p>
+                                <pre class="json-block"><code>{
+    "title": "My Event",
+    "start": "2025-08-25T10:00:00",
+    "end": "2025-08-25T11:00:00",
+    "isAllDay": false,
+    "participantsIds": [1, 2, 3]
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/events/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove an event.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/events/update/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Update an event.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Music Endpoints -->
+                    <div id="music" class="endpoints-group">
+                        <h4>Musique</h4>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/favorites/index</span>
+                            </div>
+                            <div class="endpoint-content"><p>List favorite tracks.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/music/favorites/add/{trackId}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Add a track to favorites.</p></div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/music/favorites/remove/{trackId}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove a track from favorites.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/favorites/quantity</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get the quantity of favorite tracks.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/music/favorites/isFavorite</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Vérifier si une piste est en favori.</p>
+                                <pre class="json-block"><code>{
+    "videoId": "your_video_id"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/playlists</span>
+                            </div>
+                            <div class="endpoint-content"><p>Show all playlists.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/music/playlist/create</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Créer une playlist.</p>
+                                <pre class="json-block"><code>{
+    "name": "My Playlist"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/music/playlist/add-track</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Ajouter une piste à une playlist.</p>
+                                <pre class="json-block"><code>{
+    "playlistId": 1,
+    "trackId": "your_track_id"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/playlist/index</span>
+                            </div>
+                            <div class="endpoint-content"><p>List all playlists.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/music/playlist/new</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Créer une nouvelle playlist.</p>
+                                <pre class="json-block"><code>{
+     "name": "My Playlist"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/playlist/quantity</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get the quantity of playlists.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/playlist/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get tracks from a playlist.</p></div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/music/playlist/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove a playlist.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/music/playlist/update/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Update a playlist.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/history</span>
+                            </div>
+                            <div class="endpoint-content"><p>List track history.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/music/history/add</span>
+                            </div>
+                            <div class="endpoint-content"><p>Add a track to history.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/music/youtube/search</span>
+                            </div>
+                            <div class="endpoint-content"><p>Search on YouTube.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- File Endpoints -->
+                    <div id="files" class="endpoints-group">
+                        <h4>Fichiers</h4>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/files/upload/{folderId}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Upload a file to a folder (multipart/form-data with 'file').</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/files/upload</span>
+                            </div>
+                            <div class="endpoint-content"><p>Upload a file (multipart/form-data with 'file').</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/all</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get all files from a user.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/download/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Download a file.</p></div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/files/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Delete a file.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/files/share/{id}</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Partager un fichier.</p>
+                                <pre class="json-block"><code>{
+    "userIds": [1, 2, 3]
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/files/revoke/{id}</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Révoquer l'accès à un fichier.</p>
+                                <pre class="json-block"><code>{
+    "userIds": [1, 2, 3]
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/show/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get file data.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/recent</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get recent files.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/folders</span>
+                            </div>
+                            <div class="endpoint-content"><p>List all folders.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/documents</span>
+                            </div>
+                            <div class="endpoint-content"><p>List all documents.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/images</span>
+                            </div>
+                            <div class="endpoint-content"><p>List all images.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/files/folder/create</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Créer un dossier.</p>
+                                <pre class="json-block"><code>{
+    "folderName": "My New Folder",
+    "parentId": 123
+}</code><button class="copy-btn">Copy</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/folder/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get children of a folder.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/files/move/{id}</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Déplacer un fichier.</p>
+                                <pre class="json-block"><code>{
+     "newParentId": 456
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/files/preview/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Preview a file.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Authentication Endpoints -->
+                    <div id="authentication" class="endpoints-group">
+                        <h4>Connexion</h4>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/api/auth/google</span>
+                            </div>
+                            <div class="endpoint-content"><p>Google login.</p></div>
+                        </div>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/api/auth/google/callback</span>
+                            </div>
+                            <div class="endpoint-content"><p>Google callback.</p></div>
+                        </div>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/login</span>
+                            </div>
+                            <div class="endpoint-content"><p>Login.</p></div>
+                        </div>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/logout</span>
+                            </div>
+                            <div class="endpoint-content"><p>Logout.</p></div>
+                        </div>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/register</span>
+                            </div>
+                            <div class="endpoint-content"><p>Register.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/register</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Inscription via API.</p>
+                                <pre class="json-block"><code>{
+    "email": "user@example.com",
+    "password": "password",
+    "firstName": "John",
+    "lastName": "Doe"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/sendVerificationCode/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Send verification code.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/verifyVerificationCode</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Envoyer un code de vérification.</p>
+                                <pre class="json-block"><code>{
+    "userId": 1,
+    "code": "123456"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/api/login_check</span>
+                            </div>
+                            <div class="endpoint-content"><p>Check login.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Email Endpoints -->
+                    <div id="email" class="endpoints-group">
+                        <h4>Email</h4>
+                        <div class="endpoint any">
+                            <div class="endpoint-header">
+                                <strong>ANY</strong>
+                                <span class="endpoint-url">/email</span>
+                            </div>
+                            <div class="endpoint-content"><p>Send an email.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Note Endpoints -->
+                    <div id="notes" class="endpoints-group">
+                        <h4>Notes</h4>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/notes</span>
+                            </div>
+                            <div class="endpoint-content"><p>List all notes.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/note/save/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Update a note.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/note/save</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Enregistrer une nouvelle note.</p>
+                                <pre class="json-block"><code>{
+    "title": "My Note",
+    "content": "This is the content of my note."
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/note/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove a note.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Endpoints -->
+                    <div id="notifications" class="endpoints-group">
+                        <h4>Notifications</h4>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/notifications/all</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get all notifications.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/notifications/new</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Créer une nouvelle notification.</p>
+                                <pre class="json-block"><code>{
+    "title": "New Notification",
+    "content": "This is a new notification.",
+    "userId": 1
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/notifications/{id}/read</span>
+                            </div>
+                            <div class="endpoint-content"><p>Mark a notification as read.</p></div>
+                        </div>
+                        <div class="endpoint put">
+                            <div class="endpoint-header">
+                                <strong>PUT</strong>
+                                <span class="endpoint-url">/api/notifications/readAll</span>
+                            </div>
+                            <div class="endpoint-content"><p>Mark all notifications as read.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Password Endpoints -->
+                    <div id="passwords" class="endpoints-group">
+                        <h4>Mots de passe</h4>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/passwords/add</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Ajouter un mot de passe.</p>
+                                <pre class="json-block"><code>{
+    "url": "https://example.com",
+    "name": "Example",
+    "email": "user@example.com",
+    "passwordEncrypted": "encrypted_password",
+    "iv": "initialization_vector",
+    "notes": "This is a note.",
+    "isFavorite": false
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/passwords/list</span>
+                            </div>
+                            <div class="endpoint-content"><p>List all passwords.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/passwords/set-master-password</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Définir un mot de passe principal.</p>
+                                <pre class="json-block"><code>{
+    "masterPassword": "my_master_password"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/passwords/get-master-password-hash</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get the master password hash.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/passwords/count</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get the number of passwords.</p></div>
+                        </div>
+                        <div class="endpoint patch">
+                            <div class="endpoint-header">
+                                <strong>PATCH</strong>
+                                <span class="endpoint-url">/api/passwords/update/{id}</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Mettre à jour un mot de passe.</p>
+                                <pre class="json-block"><code>{
+    "url": "https://new-example.com",
+    "name": "New Example"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint delete">
+                            <div class="endpoint-header">
+                                <strong>DELETE</strong>
+                                <span class="endpoint-url">/api/passwords/remove/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Remove a password item.</p></div>
+                        </div>
+                        <div class="endpoint patch">
+                            <div class="endpoint-header">
+                                <strong>PATCH</strong>
+                                <span class="endpoint-url">/api/passwords/toggle-favorite/{id}</span>
+                            </div>
+                            <div class="endpoint-content"><p>Toggle a password item as favorite.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Endpoints -->
+                    <div id="recommendations" class="endpoints-group">
+                        <h4>Recommandations</h4>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/recommendations</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get recommendations.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/discover</span>
+                            </div>
+                            <div class="endpoint-content"><p>Discover new content.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Track Endpoints -->
+                    <div id="track" class="endpoints-group">
+                        <h4>Pistes</h4>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/track/search</span>
+                            </div>
+                            <div class="endpoint-content"><p>Search for a track.</p></div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/track/suggest</span>
+                            </div>
+                            <div class="endpoint-content"><p>Suggest a track.</p></div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/track/add</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Ajouter une piste.</p>
+                                <pre class="json-block"><code>{
+    "youtubeId": "your_youtube_id",
+    "title": "My Track",
+    "artist": "My Artist",
+    "genre": "My Genre"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/track/setCurrentTrack</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Définir la piste actuelle de l'utilisateur.</p>
+                                <pre class="json-block"><code>{
+    "trackId": "your_track_id"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/track/like</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Aimer une piste.</p>
+                                <pre class="json-block"><code>{
+    "track": {
+        "title": "My Track",
+        "youtubeId": "your_youtube_id",
+        "artist": "My Artist",
+        "coverUrl": "https://example.com/cover.jpg"
+    }
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Endpoints -->
+                    <div id="settings" class="endpoints-group">
+                        <h4>Paramètres</h4>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/settings/enable-disable-notifications</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Activer ou désactiver les notifications.</p>
+                                <pre class="json-block"><code>{
+    "notifications_enabled": true
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/settings/enable-disable-geolocation</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Activer ou désactiver la géolocalisation.</p>
+                                <pre class="json-block"><code>{
+    "geolocation_enabled": true
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/settings/update-theme-preference</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Mettre à jour la préférence de thème.</p>
+                                <pre class="json-block"><code>{
+    "theme": "dark"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint post">
+                            <div class="endpoint-header">
+                                <strong>POST</strong>
+                                <span class="endpoint-url">/api/settings/update-current-track</span>
+                            </div>
+                            <div class="endpoint-content">
+                                <p>Mettre à jour la piste actuelle.</p>
+                                <pre class="json-block"><code>{
+    "youtubeId": "your_youtube_id",
+    "title": "My Track",
+    "artist": "My Artist",
+    "coverUrl": "https://example.com/cover.jpg"
+}</code><button class="copy-btn">Copier</button></pre>
+                            </div>
+                        </div>
+                        <div class="endpoint get">
+                            <div class="endpoint-header">
+                                <strong>GET</strong>
+                                <span class="endpoint-url">/api/settings/current-track</span>
+                            </div>
+                            <div class="endpoint-content"><p>Get the current track.</p></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
+
+    <a href="#" class="back-to-top" id="back-to-top">↑</a>
+
+    <script src="/js/doc.js"></script>
+
 </body>
 </html>

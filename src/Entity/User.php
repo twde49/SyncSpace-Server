@@ -256,6 +256,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $googleId = null;
 
+    /**
+     * @var Collection<int, Note>
+     */
+    #[ORM\ManyToMany(targetEntity: Note::class, mappedBy: 'sharedWith')]
+    private Collection $sharedNotes;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -271,6 +277,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->playlists = new ArrayCollection();
         $this->favoriteTracks = new ArrayCollection();
         $this->trackHistory = new ArrayCollection();
+        $this->sharedNotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -841,6 +848,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGoogleId(?string $googleId): static
     {
         $this->googleId = $googleId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getSharedNotes(): Collection
+    {
+        return $this->sharedNotes;
+    }
+
+    public function addSharedNote(Note $sharedNote): static
+    {
+        if (!$this->sharedNotes->contains($sharedNote)) {
+            $this->sharedNotes->add($sharedNote);
+            $sharedNote->addSharedWith($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSharedNote(Note $sharedNote): static
+    {
+        if ($this->sharedNotes->removeElement($sharedNote)) {
+            $sharedNote->removeSharedWith($this);
+        }
 
         return $this;
     }
