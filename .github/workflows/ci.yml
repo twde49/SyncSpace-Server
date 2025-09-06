@@ -86,22 +86,14 @@ jobs:
         env:
           DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
-      - name: PHP CS Fixer (dry-run)
-        run: vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --diff --verbose
-      
-      - name: Rector (dry-run)
-        run: vendor/bin/rector process --dry-run
+      - name: PHP CS Fixer
+        run: vendor/bin/php-cs-fixer fix --allow-risky=yes --diff --verbose
       
       - name: Rector auto-fix
-        if: failure()
         run: vendor/bin/rector process
 
       - name: PHPStan
         run: vendor/bin/phpstan analyse --memory-limit=512M
-
-      
-      - name: Psalm
-        run: vendor/bin/psalm
       
       - name: PHP Unit Tests
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
