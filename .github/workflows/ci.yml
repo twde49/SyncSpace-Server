@@ -152,7 +152,7 @@ jobs:
           php-version: 8.4
           tools: composer:v2
       - name: Install dependencies
-        run: ccomposer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
       - name: Security audit
         run: composer audit
 
