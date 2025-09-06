@@ -48,6 +48,11 @@ class Message
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Conversation $conversation = null;
+    
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups('conversation:read')]
+    private ?string $fileSize = null;
+    
 
     public function __construct()
     {
@@ -153,6 +158,18 @@ class Message
     public function setConversation(?Conversation $conversation): static
     {
         $this->conversation = $conversation;
+
+        return $this;
+    }
+
+    public function getFileSize(): ?string
+    {
+        return $this->fileSize;
+    }
+
+    public function setFileSize(?string $filesize): static
+    {
+        $this->fileSize = $filesize;
 
         return $this;
     }

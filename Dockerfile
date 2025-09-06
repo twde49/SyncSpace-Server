@@ -27,12 +27,15 @@ COPY . .
 RUN composer install --optimize-autoloader
 
 
-RUN mkdir -p /var/www/html/var/cache /var/www/html/var/logs \
+RUN mkdir -p /var/www/html/var/cache /var/www/html/var/logs /var/www/html/config/jwt /var/www/html/public/uploads \
     && chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/var/cache /var/www/html/var/logs
+    && chmod -R 775 /var/www/html/var/cache /var/www/html/var/logs /var/www/html/config/jwt /var/www/html/public/uploads
 
 EXPOSE 9000
 
-RUN php bin/console lexik:jwt:generate-keypair --overwrite
+# We'll generate JWT keys in an entrypoint script instead
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["php-fpm"]

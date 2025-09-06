@@ -468,6 +468,87 @@ class ChatUserModuleController extends AbstractController
 
         return $this->json($response, Response::HTTP_CREATED);
     }
+    
+    
+    /**
+     * @throws GuzzleException
+     */
+    #[
+        Route(
+            '/conversation/{id}/message/new/file',
+            name: 'send_file_message_post',
+            methods: ['POST']
+        )
+    ]
+    public function sendFileMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
+        NotificationService $notificationService): Response
+    {
+        if (!$conversation) {
+            return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
+        }
+        $file = $request->files->get('file');
+        if (!$file || !$file->isValid()) {
+            return $this->json(['error' => 'Invalid file'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $newFilename = uniqid().'.'.$file->guessExtension();
+        $uploadDir = sprintf('%s/public/uploads/files/', $this->getParameter('kernel.project_dir'));
+        try {
+            $file->move($uploadDir, $newFilename);
+        } catch (FileException $e) {
+            return $this->json(['error' => 'Failed to save file'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $publicPath = "uploads/files/{$newFilename}";
+
+        $message = new Message();
+        $message->setConversation($conversation);
+        $message->setAttachment($newFilename);
+        $message->setContent($publicPath);
+        $message->setType('file');
+        // $message->setFileSize($file->getSize());
+        $message->setSentAt(new \DateTimeImmutable());
+        $message->setSender($this->getUser());
+        $conversation->setLastMessage($message);
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $client = new Client();
+
+        $context = ['groups' => 'conversation:read'];
+        $jsonMessage = $serializer->serialize($message, 'json', $context);
+
+        $client->post($this->params->get('websocket_url').'/webhook/newMessage', [
+            'json' => ['message' => $jsonMessage, 'conversationId' => $conversation->getId()],
+        ]);
+
+        $client->post($this->params->get('websocket_url').'/webhook/refreshConversations');
+
+        foreach ($conversation->getUsers() as $user) {
+            if ($user !== $currentUser) {
+                $notificationService->sendNotification(
+                    'Nouveau message de '.
+                    $currentUser->getFirstName().
+                    ' '.
+                    $currentUser->getLastName(),
+                    $message->getContent(),
+                    $user
+                );
+            }
+        }
+
+        $response = [
+            'detail' => 'Your file message has been sent',
+            'Status' => 201,
+            'content' => $message->getContent(),
+        ];
+
+        $manager->persist($message);
+        $manager->persist($conversation);
+        $manager->flush();
+
+        return $this->json($response, Response::HTTP_CREATED);
+    }
 
     /**
      * @throws GuzzleException
