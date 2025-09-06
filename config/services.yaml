@@ -31,7 +31,7 @@ services:
 
     App\Service\LastFmService:
         arguments:
-            $lastFmApiKey: '%last_fm_api_key%'
+            $apiKey: '%last_fm_api_key%'
     App\Service\YoutubeService:
         arguments:
             $youtubeApiKey: '%youtube_api_key%'
