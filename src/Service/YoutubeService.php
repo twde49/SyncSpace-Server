@@ -8,15 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class YoutubeService
 {
-    private string $apiKey;
-    private HttpClientInterface $http;
-
-    public function __construct(
-        HttpClientInterface $http,
-        string $youtubeApiKey,
-    ) {
-        $this->http = $http;
-        $this->apiKey = $youtubeApiKey;
+    public function __construct(private readonly HttpClientInterface $http, private readonly string $apiKey)
+    {
     }
 
     /**
@@ -47,9 +40,7 @@ class YoutubeService
             return [];
         }
 
-        $filteredItems = array_filter($data['items'], function ($item) {
-            return isset($item['id']['videoId']);
-        });
+        $filteredItems = array_filter($data['items'], fn($item) => isset($item['id']['videoId']));
 
         return array_map(function ($item) {
             $videoId = $item['id']['videoId'];
@@ -75,7 +66,7 @@ class YoutubeService
         $results = $this->search($query, 5);
 
         foreach ($results as $result) {
-            $titleLower = strtolower($result['title']);
+            $titleLower = strtolower((string) $result['title']);
 
             // Filtrage basique
             if (

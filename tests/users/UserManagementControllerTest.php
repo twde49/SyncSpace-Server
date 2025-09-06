@@ -17,7 +17,7 @@ class UserManagementControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private UserRepository $userRepository;
-    private EntityManagerInterface $manager;
+    private readonly EntityManagerInterface $manager;
 
     private array $userTestData = [];
 

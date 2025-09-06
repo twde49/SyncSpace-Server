@@ -9,11 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class TrackService
 {
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $em;
     }
 
     /**

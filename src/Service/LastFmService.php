@@ -8,14 +8,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LastFmService
 {
-    private HttpClientInterface $http;
-    private string $apiKey;
     private string $apiUrl = 'http://ws.audioscrobbler.com/2.0/';
 
-    public function __construct(HttpClientInterface $http, string $lastFmApiKey)
+    public function __construct(private readonly HttpClientInterface $http, private readonly string $apiKey)
     {
-        $this->http = $http;
-        $this->apiKey = $lastFmApiKey;
     }
 
     /**

@@ -10,21 +10,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RecommendationService
 {
-    private HttpClientInterface $httpClient;
-    private TrackRepository $trackRepository;
-    private string $lastFmApiKey;
-    private YoutubeService $youtubeService;
-
-    public function __construct(
-        HttpClientInterface $httpClient,
-        TrackRepository $trackRepository,
-        YoutubeService $youtubeService,
-        string $lastFmApiKey,
-    ) {
-        $this->httpClient = $httpClient;
-        $this->trackRepository = $trackRepository;
-        $this->youtubeService = $youtubeService;
-        $this->lastFmApiKey = $lastFmApiKey;
+    public function __construct(private readonly HttpClientInterface $httpClient, private readonly TrackRepository $trackRepository, private readonly YoutubeService $youtubeService, private readonly string $lastFmApiKey)
+    {
     }
 
     public function getNextRecommendation(string $artist, ?string $track = null, int $offset = 0): ?array

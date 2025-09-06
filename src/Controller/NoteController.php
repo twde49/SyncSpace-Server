@@ -23,11 +23,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('api/note')]
 class NoteController extends AbstractController
 {
-    private ParameterBagInterface $params;
-
-    public function __construct(ParameterBagInterface $params)
+    public function __construct(private readonly ParameterBagInterface $params)
     {
-        $this->params = $params;
     }
 
     /**

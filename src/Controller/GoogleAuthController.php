@@ -18,9 +18,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class GoogleAuthController extends AbstractController
 {
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private EntityManagerInterface $entityManager,
-        private JWTTokenManagerInterface $jwtManager,
+        private readonly HttpClientInterface $httpClient,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly JWTTokenManagerInterface $jwtManager,
     ) {
     }
 

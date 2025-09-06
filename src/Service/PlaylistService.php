@@ -11,11 +11,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class PlaylistService
 {
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $em;
     }
 
     /**

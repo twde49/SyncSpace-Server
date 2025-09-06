@@ -206,8 +206,8 @@ class PasswordItem
 
     public function decryptPassword(string $encryptionKey): ?string
     {
-        $data = explode('::', base64_decode($this->passwordEncrypted, true));
-        $iv = base64_decode($this->iv, true);
+        $data = explode('::', base64_decode((string) $this->passwordEncrypted, true));
+        $iv = base64_decode((string) $this->iv, true);
 
         return openssl_decrypt($data[0], 'aes-256-gcm', $encryptionKey, 0, $iv, $data[1]);
     }

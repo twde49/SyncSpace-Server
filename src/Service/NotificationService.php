@@ -14,17 +14,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class NotificationService
 {
-    private $params;
-    private $normalizer;
-    private $notificationRepository;
-    private $manager;
-
-    public function __construct(ParameterBagInterface $params, NormalizerInterface $normalizer, NotificationRepository $notificationRepository, EntityManagerInterface $manager)
+    public function __construct(private readonly ParameterBagInterface $params, private readonly NormalizerInterface $normalizer, private readonly NotificationRepository $notificationRepository, private readonly EntityManagerInterface $manager)
     {
-        $this->params = $params;
-        $this->normalizer = $normalizer;
-        $this->notificationRepository = $notificationRepository;
-        $this->manager = $manager;
     }
 
     public function sendNotification(string $title, string $content, User $toUser): void

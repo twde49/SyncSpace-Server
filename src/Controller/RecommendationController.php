@@ -12,11 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RecommendationController extends AbstractController
 {
-    private RecommendationService $recommendationService;
-
-    public function __construct(RecommendationService $recommendationService)
+    public function __construct(private readonly RecommendationService $recommendationService)
     {
-        $this->recommendationService = $recommendationService;
     }
 
     #[Route('/api/recommendations', name: 'api_recommendations', methods: ['GET'])]
@@ -39,7 +36,7 @@ class RecommendationController extends AbstractController
         }
 
         if (!$recommendation) {
-            $recommendation = $this->recommendationService->getDiscoverRecommendation($offset);
+            $recommendation = $this->recommendationService->getDiscoverRecommendation();
         }
 
         if (!$recommendation) {

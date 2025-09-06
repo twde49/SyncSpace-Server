@@ -8,7 +8,7 @@ use Random\RandomException;
 
 class EncryptionService
 {
-    private string $encryptionKey;
+    private readonly string $encryptionKey;
 
     public function __construct(string $masterPassword)
     {

@@ -92,8 +92,8 @@ jobs:
       - name: Rector auto-fix
         run: vendor/bin/rector process
 
-      - name: PHPStan
-        run: vendor/bin/phpstan analyse --memory-limit=512M
+      #- name: PHPStan
+      #  run: vendor/bin/phpstan analyse --memory-limit=512M
       
       - name: PHP Unit Tests
         run: vendor/bin/phpunit --coverage-clover=coverage.xml

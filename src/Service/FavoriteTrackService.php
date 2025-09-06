@@ -11,14 +11,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class FavoriteTrackService
 {
-    private EntityManagerInterface $entityManager;
-
-    private TrackRepository $trackRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, TrackRepository $trackRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly TrackRepository $trackRepository)
     {
-        $this->entityManager = $entityManager;
-        $this->trackRepository = $trackRepository;
     }
 
     public function updateFavorite(User $user, string $trackId): void

@@ -21,11 +21,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/events')]
 class EventController extends AbstractController
 {
-    private ParameterBagInterface $params;
-
-    public function __construct(ParameterBagInterface $params)
+    public function __construct(private readonly ParameterBagInterface $params)
     {
-        $this->params = $params;
     }
 
     #[Route('/all', name: 'app_event_index', methods: ['GET'])]

@@ -28,13 +28,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('api')]
 class ChatUserModuleController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-    private ParameterBagInterface $params;
-
-    public function __construct(EntityManagerInterface $entityManager, ParameterBagInterface $params)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ParameterBagInterface $params)
     {
-        $this->params = $params;
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -121,11 +116,9 @@ class ChatUserModuleController extends AbstractController
                     'Nouvelle conversation avec '.
                         implode(
                             ', ',
-                            array_map(function ($user) {
-                                return $user->getFirstName().
-                                    ' '.
-                                    $user->getLastName();
-                            }, $conversation->getUsers()->toArray())
+                            array_map(fn($user) => $user->getFirstName().
+                                ' '.
+                                $user->getLastName(), $conversation->getUsers()->toArray())
                         ),
                     $user
                 );
@@ -343,7 +336,7 @@ class ChatUserModuleController extends AbstractController
         $uploadDir = sprintf('%s/public/uploads/audio/', $this->getParameter('kernel.project_dir'));
         try {
             $audioFile->move($uploadDir, $newFilename);
-        } catch (FileException $e) {
+        } catch (FileException) {
             return $this->json(['error' => 'Failed to save audio file'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -426,7 +419,7 @@ class ChatUserModuleController extends AbstractController
         $uploadDir = sprintf('%s/public/uploads/images/', $this->getParameter('kernel.project_dir'));
         try {
             $imageFile->move($uploadDir, $newFilename);
-        } catch (FileException $e) {
+        } catch (FileException) {
             return $this->json(['error' => 'Failed to save image file'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -509,7 +502,7 @@ class ChatUserModuleController extends AbstractController
         $uploadDir = sprintf('%s/public/uploads/files/', $this->getParameter('kernel.project_dir'));
         try {
             $file->move($uploadDir, $newFilename);
-        } catch (FileException $e) {
+        } catch (FileException) {
             return $this->json(['error' => 'Failed to save file'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

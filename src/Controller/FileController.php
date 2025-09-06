@@ -244,9 +244,7 @@ class FileController extends AbstractController
         );
 
         $sortedFiles = $allFiles->toArray();
-        usort($sortedFiles, function ($a, $b) {
-            return $b->getUploadedAt() <=> $a->getUploadedAt();
-        });
+        usort($sortedFiles, fn($a, $b) => $b->getUploadedAt() <=> $a->getUploadedAt());
 
         $recentFiles = array_slice($sortedFiles, 0, 5);
 
@@ -272,9 +270,7 @@ class FileController extends AbstractController
 
         $sortedFiles = $allFiles->toArray();
 
-        $foldersFile = array_filter($sortedFiles, function ($file) {
-            return $file->isFolder();
-        });
+        $foldersFile = array_filter($sortedFiles, fn($file) => $file->isFolder());
         $foldersFile = array_values($foldersFile);
 
         return $this->json(
@@ -299,9 +295,7 @@ class FileController extends AbstractController
 
         $sortedFiles = $allFiles->toArray();
 
-        $documentsFile = array_filter($sortedFiles, function ($file) {
-            return in_array($file->getMimeType(), self::DOCUMENT_MIME_TYPES, true);
-        });
+        $documentsFile = array_filter($sortedFiles, fn($file) => in_array($file->getMimeType(), self::DOCUMENT_MIME_TYPES, true));
         $documentsFile = array_values($documentsFile);
 
         return $this->json(
@@ -326,9 +320,7 @@ class FileController extends AbstractController
 
         $sortedFiles = $allFiles->toArray();
 
-        $imagesFile = array_filter($sortedFiles, function ($file) {
-            return in_array($file->getMimeType(), self::IMAGE_MIME_TYPES, true);
-        });
+        $imagesFile = array_filter($sortedFiles, fn($file) => in_array($file->getMimeType(), self::IMAGE_MIME_TYPES, true));
         $imagesFile = array_values($imagesFile);
 
         return $this->json(
