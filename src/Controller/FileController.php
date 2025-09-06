@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\File;
@@ -298,7 +300,7 @@ class FileController extends AbstractController
         $sortedFiles = $allFiles->toArray();
 
         $documentsFile = array_filter($sortedFiles, function ($file) {
-            return in_array($file->getMimeType(), self::DOCUMENT_MIME_TYPES);
+            return in_array($file->getMimeType(), self::DOCUMENT_MIME_TYPES, true);
         });
         $documentsFile = array_values($documentsFile);
 
@@ -325,7 +327,7 @@ class FileController extends AbstractController
         $sortedFiles = $allFiles->toArray();
 
         $imagesFile = array_filter($sortedFiles, function ($file) {
-            return in_array($file->getMimeType(), self::IMAGE_MIME_TYPES);
+            return in_array($file->getMimeType(), self::IMAGE_MIME_TYPES, true);
         });
         $imagesFile = array_values($imagesFile);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +16,7 @@ class ContactController extends AbstractController
     public function getContact(Request $request): Response
     {
         $data = $request->query->all();
+
         return new Response(json_encode($data), Response::HTTP_OK);
     }
 }

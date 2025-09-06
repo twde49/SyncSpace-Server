@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Event;
@@ -19,14 +21,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/events')]
 class EventController extends AbstractController
 {
-    
     private ParameterBagInterface $params;
-    
+
     public function __construct(ParameterBagInterface $params)
     {
         $this->params = $params;
     }
-    
+
     #[Route('/all', name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
@@ -61,7 +62,7 @@ class EventController extends AbstractController
 
         $client = new Client();
 
-        $client->post($this->params->get('websocket_url'). '/webhook/refreshCalendar');
+        $client->post($this->params->get('websocket_url').'/webhook/refreshCalendar');
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
@@ -94,8 +95,7 @@ class EventController extends AbstractController
 
         return $this->json('Successfully removed event', Response::HTTP_OK);
     }
-    
-    
+
     #[Route('/update/{id}', name: 'app_event_update', methods: ['PUT'])]
     public function updateEvent(?Event $event, Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, UserRepository $userRepository, NotificationService $notificationService): Response
     {
@@ -141,7 +141,7 @@ class EventController extends AbstractController
         $manager->flush();
 
         $client = new Client();
-        $client->post($this->params->get('websocket_url'). '/webhook/refreshCalendar');
+        $client->post($this->params->get('websocket_url').'/webhook/refreshCalendar');
 
         foreach ($event->getParticipants() as $user) {
             if ($user !== $currentUser) {
@@ -155,5 +155,4 @@ class EventController extends AbstractController
 
         return $this->json($event, Response::HTTP_OK, [], ['groups' => ['event:read']]);
     }
-
 }

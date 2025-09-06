@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\TrackRepository;
@@ -29,7 +31,7 @@ class Track
     #[Groups(['favoriteTrack:read', 'playlist:read'])]
     private ?string $youtubeId = null;
 
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: "currentTrack")]
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'currentTrack')]
     private Collection $usersListening;
 
     #[ORM\Column(length: 255)]

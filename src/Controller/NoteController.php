@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Conversation;
@@ -21,14 +23,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('api/note')]
 class NoteController extends AbstractController
 {
-    
     private ParameterBagInterface $params;
-    
+
     public function __construct(ParameterBagInterface $params)
     {
         $this->params = $params;
     }
-    
+
     /**
      * Retrieves a list of notes associated with the current user, sorted in ascending order.
      *
@@ -159,7 +160,7 @@ class NoteController extends AbstractController
     }
 
     #[Route('/new/share/{id}', name: 'create_shared_note', methods: 'POST')]
-    public function createNewSharedNote(Conversation $conversation,Request $request, UserRepository $userRepository, EntityManagerInterface $manager, SerializerInterface $serializer, NotificationService $notificationService): Response
+    public function createNewSharedNote(Conversation $conversation, Request $request, UserRepository $userRepository, EntityManagerInterface $manager, SerializerInterface $serializer, NotificationService $notificationService): Response
     {
         $data = $request->toArray();
         $title = $data['title'] ?? '';
@@ -190,7 +191,7 @@ class NoteController extends AbstractController
         $manager->persist($note);
         $manager->persist($message);
         $manager->flush();
-        
+
         $client = new Client();
 
         $context = ['groups' => 'conversation:read'];

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\EventListener;
 
 use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 class AuthenticationSuccessListener
 {
@@ -13,16 +14,17 @@ class AuthenticationSuccessListener
         $data = $event->getData();
         $user = $event->getUser();
 
-        if (!$user instanceof User ) {
+        if (!$user instanceof User) {
             return;
         }
-        
+
         if (!$user->isValidated()) {
             $data['user'] = [
                 'userId' => $user->getId(),
                 'message' => 'User not validated',
             ];
             $event->setData($data);
+
             return;
         }
 
@@ -35,7 +37,7 @@ class AuthenticationSuccessListener
                 'modulesLayout' => $user->getUserSettings()->getModulesLayout(),
                 'notificationsEnabled' => $user->getUserSettings()->isNotificationsEnabled(),
                 'geolocationEnabled' => $user->getUserSettings()->isGeolocationEnabled(),
-            ]
+            ],
         ];
 
         $event->setData($data);

@@ -24,7 +24,7 @@ final class Version20250811115313 extends AbstractMigration
         $this->addSql(<<<'SQL'
             ALTER TABLE favorite_track ADD track_id INT
         SQL);
-        
+
         // Migrate data from the many-to-many table to the direct relationship
         $this->addSql(<<<'SQL'
             UPDATE favorite_track 
@@ -35,12 +35,12 @@ final class Version20250811115313 extends AbstractMigration
                 LIMIT 1
             )
         SQL);
-        
+
         // Now make the column NOT NULL
         $this->addSql(<<<'SQL'
             ALTER TABLE favorite_track ALTER track_id SET NOT NULL
         SQL);
-        
+
         // Drop the old many-to-many constraints and table
         $this->addSql(<<<'SQL'
             ALTER TABLE favorite_track_track DROP CONSTRAINT fk_65061f42f48524b2
@@ -51,7 +51,7 @@ final class Version20250811115313 extends AbstractMigration
         $this->addSql(<<<'SQL'
             DROP TABLE favorite_track_track
         SQL);
-        
+
         // Add the foreign key constraint and index
         $this->addSql(<<<'SQL'
             ALTER TABLE favorite_track ADD CONSTRAINT FK_606BD3825ED23C43 FOREIGN KEY (track_id) REFERENCES track (id) NOT DEFERRABLE INITIALLY IMMEDIATE

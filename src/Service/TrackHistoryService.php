@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Track;
@@ -19,7 +21,9 @@ class TrackHistoryService
     public function addTrackToHistory(User $user, int $trackId): void
     {
         $track = $this->em->getRepository(Track::class)->find($trackId);
-        if (!$track) return;
+        if (!$track) {
+            return;
+        }
 
         $history = new TrackHistory();
         $history->setOfUser($user);

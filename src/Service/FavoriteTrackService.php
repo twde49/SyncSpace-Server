@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\FavoriteTrack;
@@ -26,7 +28,7 @@ class FavoriteTrackService
 
         if ($track) {
             foreach ($favorites as $favorite) {
-                switch ($favorite->getTrack()->getYoutubeId() == $track->getYoutubeId()) {
+                switch ($favorite->getTrack()->getYoutubeId() === $track->getYoutubeId()) {
                     case true:
                         $this->entityManager->remove($favorite);
                         $this->entityManager->flush();

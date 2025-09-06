@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\User;
@@ -128,7 +130,7 @@ class RegistrationController extends AbstractController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     #[Route('/api/verifyVerificationCode', methods: ['POST'])]
     public function verifyVerificationCode(Request $request, EntityManagerInterface $entityManager): Response
     {

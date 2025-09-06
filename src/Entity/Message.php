@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
@@ -48,11 +50,10 @@ class Message
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Conversation $conversation = null;
-    
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups('conversation:read')]
     private ?string $fileSize = null;
-    
 
     public function __construct()
     {

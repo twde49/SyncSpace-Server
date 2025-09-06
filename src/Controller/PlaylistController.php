@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Playlist;
+use App\Entity\User;
 use App\Service\PlaylistService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\User;
 
 #[Route('/api/music/playlist')]
 class PlaylistController extends AbstractController
@@ -83,7 +85,7 @@ class PlaylistController extends AbstractController
 
         return $this->json($playlist->getTracks(), Response::HTTP_OK, [], ['groups' => 'playlist:read']);
     }
-    
+
     #[Route('/remove/{id}', name: 'playlist_remove', methods: ['DELETE'])]
     public function removePlaylist(?Playlist $playlist, EntityManagerInterface $entityManager): Response
     {
@@ -103,7 +105,7 @@ class PlaylistController extends AbstractController
 
         return $this->json(['status' => 'Playlist removed']);
     }
-    
+
     #[Route('/update/{id}', name: 'playlist_update', methods: ['PUT'])]
     public function updatePlaylist(?Playlist $playlist, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -129,5 +131,4 @@ class PlaylistController extends AbstractController
 
         return $this->json(['status' => 'Playlist updated successfully']);
     }
-
 }

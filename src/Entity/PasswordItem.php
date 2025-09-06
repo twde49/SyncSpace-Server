@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\PasswordItemRepository;
@@ -204,8 +206,8 @@ class PasswordItem
 
     public function decryptPassword(string $encryptionKey): ?string
     {
-        $data = explode('::', base64_decode($this->passwordEncrypted));
-        $iv = base64_decode($this->iv);
+        $data = explode('::', base64_decode($this->passwordEncrypted, true));
+        $iv = base64_decode($this->iv, true);
 
         return openssl_decrypt($data[0], 'aes-256-gcm', $encryptionKey, 0, $iv, $data[1]);
     }

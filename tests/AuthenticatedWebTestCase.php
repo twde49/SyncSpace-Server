@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests;
 
 use App\Entity\User;
@@ -32,9 +34,9 @@ class AuthenticatedWebTestCase extends WebTestCase
         }
     }
 
-    protected function createAuthenticatedClient(string $password = 'password'): \Symfony\Bundle\FrameworkBundle\KernelBrowser
+    protected function createAuthenticatedClient(string $password = 'password'): KernelBrowser
     {
-        if (self::$client === null) {
+        if (null === self::$client) {
             self::$client = static::createClient();
         }
 

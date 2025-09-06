@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Service\RecommendationService;
@@ -47,7 +49,6 @@ class RecommendationController extends AbstractController
         return $this->json($recommendation);
     }
 
-
     #[Route('/api/discover', name: 'api_discover', methods: ['GET'])]
     public function discover(Request $request): JsonResponse
     {
@@ -59,5 +60,4 @@ class RecommendationController extends AbstractController
 
         return $this->json($recommendation);
     }
-
 }

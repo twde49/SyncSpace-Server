@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\users;
 
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
-use Faker\Factory;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
+use Faker\Factory;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -30,16 +32,16 @@ class UserManagementControllerTest extends WebTestCase
         $container = static::getContainer();
 
         /** @var EntityManager $em */
-        $em = $container->get("doctrine")->getManager();
+        $em = $container->get('doctrine')->getManager();
         $this->userRepository = $container->get(UserRepository::class);
 
         $faker = Factory::create();
-        if ($this->userTestData == []){
+        if ([] === $this->userTestData) {
             $this->userTestData = [
-                "email" => $faker->email(),
-                "password" => $faker->password(),
-                "first_name" => $faker->firstName(),
-                "last_name" => $faker->lastName(),
+                'email' => $faker->email(),
+                'password' => $faker->password(),
+                'first_name' => $faker->firstName(),
+                'last_name' => $faker->lastName(),
             ];
         }
 
@@ -49,27 +51,26 @@ class UserManagementControllerTest extends WebTestCase
 
     public function testRegisterApi(): void
     {
-        dump("1",$this->userTestData);
+        dump('1', $this->userTestData);
         $this->client->request('POST', '/api/register', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(
             [
-                'email' => $this->userTestData["email"],
-                'password' => $this->userTestData["password"],
-                'firstName' => $this->userTestData["first_name"],
-                'lastName' => $this->userTestData["last_name"]
+                'email' => $this->userTestData['email'],
+                'password' => $this->userTestData['password'],
+                'firstName' => $this->userTestData['first_name'],
+                'lastName' => $this->userTestData['last_name'],
             ]
         ));
         self::assertResponseIsSuccessful();
 
 
-        self::assertNotNull($this->userRepository->findBy(['email'=>$this->userTestData["email"]]));
+        self::assertNotNull($this->userRepository->findBy(['email' => $this->userTestData['email']]));
     }
-
 
     public function testLoginApi(): void
     {
-        dump("2",$this->userTestData);
+        dump('2', $this->userTestData);
         $this->client->request('POST', '/api/login_check', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(
-            ['username' => $this->userTestData["email"], 'password' => $this->userTestData["password"]]
+            ['username' => $this->userTestData['email'], 'password' => $this->userTestData['password']]
         ));
 
         $response = $this->client->getResponse();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Conversation;
@@ -321,9 +323,14 @@ class ChatUserModuleController extends AbstractController
             methods: ['POST']
         )
     ]
-    public function sendAudioMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
-        NotificationService $notificationService, UrlGeneratorInterface $urlGenerator): Response
-    {
+    public function sendAudioMessage(
+        Request $request,
+        Conversation $conversation,
+        EntityManagerInterface $manager,
+        SerializerInterface $serializer,
+        NotificationService $notificationService,
+        UrlGeneratorInterface $urlGenerator,
+    ): Response {
         if (!$conversation) {
             return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
         }
@@ -400,9 +407,13 @@ class ChatUserModuleController extends AbstractController
             methods: ['POST']
         )
     ]
-    public function sendImageMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
-        NotificationService $notificationService): Response
-    {
+    public function sendImageMessage(
+        Request $request,
+        Conversation $conversation,
+        EntityManagerInterface $manager,
+        SerializerInterface $serializer,
+        NotificationService $notificationService,
+    ): Response {
         if (!$conversation) {
             return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
         }
@@ -468,8 +479,7 @@ class ChatUserModuleController extends AbstractController
 
         return $this->json($response, Response::HTTP_CREATED);
     }
-    
-    
+
     /**
      * @throws GuzzleException
      */
@@ -480,9 +490,13 @@ class ChatUserModuleController extends AbstractController
             methods: ['POST']
         )
     ]
-    public function sendFileMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
-        NotificationService $notificationService): Response
-    {
+    public function sendFileMessage(
+        Request $request,
+        Conversation $conversation,
+        EntityManagerInterface $manager,
+        SerializerInterface $serializer,
+        NotificationService $notificationService,
+    ): Response {
         if (!$conversation) {
             return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
         }
@@ -560,9 +574,13 @@ class ChatUserModuleController extends AbstractController
             methods: ['POST']
         )
     ]
-    public function sendGifMessage(Request $request, Conversation $conversation, EntityManagerInterface $manager, SerializerInterface $serializer,
-        NotificationService $notificationService): Response
-    {
+    public function sendGifMessage(
+        Request $request,
+        Conversation $conversation,
+        EntityManagerInterface $manager,
+        SerializerInterface $serializer,
+        NotificationService $notificationService,
+    ): Response {
         if (!$conversation) {
             return $this->json(['error' => 'Conversation not found'], Response::HTTP_NOT_FOUND);
         }

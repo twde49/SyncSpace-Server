@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Playlist;
@@ -17,7 +19,6 @@ class PlaylistService
     }
 
     /**
-     * @param User   $user
      * @param string $name
      */
     public function createPlaylist(User $user, $name): Playlist

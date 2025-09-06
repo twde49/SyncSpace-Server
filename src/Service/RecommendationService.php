@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Track;
@@ -60,8 +62,6 @@ class RecommendationService
 
         return null;
     }
-
-
 
     /**
      * Hydrate la première recommandation d'un youtubeId et renvoie cette recommandation en tableau.
@@ -259,7 +259,4 @@ class RecommendationService
             'coverUrl' => $track->getCoverUrl(),
         ];
     }
-
-
-
 }

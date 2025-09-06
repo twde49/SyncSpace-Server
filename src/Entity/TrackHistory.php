@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\TrackHistoryRepository;
@@ -13,7 +15,7 @@ class TrackHistory
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "trackHistory")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'trackHistory')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $ofUser = null;
 

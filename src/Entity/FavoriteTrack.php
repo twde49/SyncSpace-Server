@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\FavoriteTrackRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -16,11 +17,11 @@ class FavoriteTrack
     #[Groups(['favoriteTrack:read'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: "favoriteTracks")]
+    #[ORM\ManyToOne(inversedBy: 'favoriteTracks')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $relatedTo = null;
 
-    #[ORM\ManyToOne(targetEntity: Track::class, cascade: ["persist"])]
+    #[ORM\ManyToOne(targetEntity: Track::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['favoriteTrack:read'])]
     private ?Track $track = null;
@@ -45,7 +46,6 @@ class FavoriteTrack
 
         return $this;
     }
-
 
     public function getTrack(): ?Track
     {
