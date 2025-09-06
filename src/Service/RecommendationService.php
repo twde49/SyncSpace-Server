@@ -10,7 +10,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RecommendationService
 {
-    public function __construct(private readonly HttpClientInterface $httpClient, private readonly TrackRepository $trackRepository, private readonly YoutubeService $youtubeService, private readonly string $lastFmApiKey)
+    public function __construct(private readonly HttpClientInterface $httpClient, private readonly TrackRepository $trackRepository, private readonly YoutubeService $youtubeService, private readonly string $apiKey)
     {
     }
 
