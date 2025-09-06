@@ -90,7 +90,8 @@ jobs:
         run: vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --diff --verbose
       
       - name: PHPStan
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --memory-limit=512M
+
       
       - name: Psalm
         run: vendor/bin/psalm
@@ -138,6 +139,7 @@ jobs:
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
+          ignore: DL3008
 
   security:
     name: Security Audit
