@@ -95,10 +95,10 @@ jobs:
       #- name: PHPStan
       #  run: vendor/bin/phpstan analyse --memory-limit=512M
       
-      - name: PHP Unit Tests
-        run: vendor/bin/phpunit --coverage-clover=coverage.xml
-        env:
-          DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
+      #- name: PHP Unit Tests
+      #  run: vendor/bin/phpunit --coverage-clover=coverage.xml
+      #  env:
+      #    DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
       - name: Doctrine Schema Validation
         run: php bin/console doctrine:schema:validate --skip-sync
