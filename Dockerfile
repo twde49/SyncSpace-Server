@@ -2,7 +2,7 @@ FROM php:8.3-fpm
 
 COPY ./package.json /var/www/html/package.json
 
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
     libpq-dev \
     unzip \
     git \
@@ -14,7 +14,7 @@ RUN apt update && apt install -y \
     && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony \
     && docker-php-ext-install opcache \
     && echo "short_open_tag = Off" >> /usr/local/etc/php/conf.d/99-custom.ini \
-    && apt install -y nodejs npm \
+    && apt-get install -y nodejs npm \
     && npm install
 
 WORKDIR /var/www/html

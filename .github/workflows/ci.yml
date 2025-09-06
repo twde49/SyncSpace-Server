@@ -25,7 +25,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U symfony"
+          --health-cmd="pg_isready -U syncspaceuser"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -51,6 +51,9 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, pgsql, redis, opcache
           coverage: xdebug
           tools: composer:v2
+      
+      - name: Create .env file from .env.example
+        run: cp .env.example .env
       
       - name: Get composer cache directory
         id: composer-cache
@@ -84,7 +87,7 @@ jobs:
           php bin/console doctrine:schema:create --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
         env:
-          DATABASE_URL: postgresql://symfony:symfony@127.0.0.1:5432/symfony_test?serverVersion=15&charset=utf8
+          DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
       - name: PHP CS Fixer (dry-run)
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
@@ -98,18 +101,18 @@ jobs:
       - name: PHP Unit Tests
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
         env:
-          DATABASE_URL: postgresql://symfony:symfony@127.0.0.1:5432/symfony_test?serverVersion=15&charset=utf8
+          DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
       - name: Doctrine Schema Validation
         run: php bin/console doctrine:schema:validate --skip-sync
         env:
-          DATABASE_URL: postgresql://symfony:symfony@127.0.0.1:5432/symfony_test?serverVersion=15&charset=utf8
+          DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
       - name: Security Check
         run: symfony security:check
       
       - name: Upload coverage to Codecov
-        if: matrix.php-version == '8.3'
+        if: matrix.php-version == '8.4'
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
@@ -144,10 +147,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create .env file from .env.example
+        run: cp .env.example .env
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
           tools: composer:v2
       - name: Install dependencies
         run: composer install --prefer-dist --no-dev --optimize-autoloader
