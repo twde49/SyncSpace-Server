@@ -87,7 +87,7 @@ jobs:
           DATABASE_URL: postgresql://syncspaceuser:WueUVn8B7K122zVkVtJ8F7@127.0.0.1:5432/syncspace_test?serverVersion=15&charset=utf8
       
       - name: PHP CS Fixer (dry-run)
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+        run: vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --diff --verbose
       
       - name: PHPStan
         run: vendor/bin/phpstan analyse
