@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250804095305 extends AbstractMigration
+final class Version20250905123314 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,16 +21,19 @@ final class Version20250804095305 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" ADD verification_code VARCHAR(255) DEFAULT NULL
+            CREATE TABLE note_user (note_id INT NOT NULL, user_id INT NOT NULL, PRIMARY KEY(note_id, user_id))
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" ADD verification_code_valid_until DATE DEFAULT NULL
+            CREATE INDEX IDX_2DE9C71126ED0855 ON note_user (note_id)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" ADD is_validated BOOLEAN NOT NULL DEFAULT false
+            CREATE INDEX IDX_2DE9C711A76ED395 ON note_user (user_id)
         SQL);
         $this->addSql(<<<'SQL'
-            COMMENT ON COLUMN "user".verification_code_valid_until IS '(DC2Type:datetime_immutable)'
+            ALTER TABLE note_user ADD CONSTRAINT FK_2DE9C71126ED0855 FOREIGN KEY (note_id) REFERENCES note (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE note_user ADD CONSTRAINT FK_2DE9C711A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE
         SQL);
     }
 
@@ -41,13 +44,13 @@ final class Version20250804095305 extends AbstractMigration
             CREATE SCHEMA public
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" DROP verification_code
+            ALTER TABLE note_user DROP CONSTRAINT FK_2DE9C71126ED0855
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" DROP verification_code_valid_until
+            ALTER TABLE note_user DROP CONSTRAINT FK_2DE9C711A76ED395
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE "user" DROP is_validated
+            DROP TABLE note_user
         SQL);
     }
 }
