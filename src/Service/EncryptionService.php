@@ -16,6 +16,12 @@ class EncryptionService
     }
 
     /**
+     * Encrypts the given data using AES-256-GCM.
+     *
+     * @param string $data The data to encrypt
+     *
+     * @return array An array containing the ciphertext and IV
+     *
      * @throws RandomException
      */
     public function encryptData(string $data): array
@@ -29,6 +35,14 @@ class EncryptionService
         ];
     }
 
+    /**
+     * Decrypts the given ciphertext using AES-256-GCM.
+     *
+     * @param string $ciphertext The encrypted data (base64 encoded)
+     * @param string $iv         The initialization vector (base64 encoded)
+     *
+     * @return string The decrypted data
+     */
     public function decryptData(string $ciphertext, string $iv): string
     {
         $data = explode('::', base64_decode($ciphertext, true));

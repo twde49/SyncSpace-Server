@@ -13,12 +13,12 @@ class YoutubeService
     }
 
     /**
-     * Recherche des vidéos YouTube via l'API.
+     * Searches for YouTube videos via the API.
      *
-     * @param string $query      la requête de recherche
-     * @param int    $maxResults nombre max de résultats à récupérer
+     * @param string $query      The search query
+     * @param int    $maxResults The maximum number of results to retrieve
      *
-     * @return array liste des vidéos (videoId, title, channelTitle, thumbnail, isLiked)
+     * @return array List of videos (videoId, title, channelTitle, thumbnail)
      */
     public function search(
         string $query,
@@ -40,7 +40,7 @@ class YoutubeService
             return [];
         }
 
-        $filteredItems = array_filter($data['items'], fn($item) => isset($item['id']['videoId']));
+        $filteredItems = array_filter($data['items'], fn ($item) => isset($item['id']['videoId']));
 
         return array_map(function ($item) {
             $videoId = $item['id']['videoId'];
@@ -55,10 +55,13 @@ class YoutubeService
     }
 
     /**
-     * Recherche la meilleure vidéo correspondant à l'artiste + titre,
-     * en testant plusieurs requêtes et filtrant par durée et popularité.
+     * Searches for the best video matching the artist and title,
+     * by testing multiple queries and filtering by duration and popularity.
      *
-     * @return string|null L'ID de la vidéo YouTube ou null si aucune trouvée
+     * @param string $artist The artist
+     * @param string $title  The title
+     *
+     * @return string|null The YouTube video ID or null if none found
      */
     public function searchBestVideoId(string $artist, string $title): ?string
     {
@@ -90,9 +93,11 @@ class YoutubeService
     }
 
     /**
-     * Recherche des vidéos pour une requête et filtre sur durée et vues.
+     * Searches for videos for a query and filters by duration and views.
      *
-     * @return string|null ID vidéo valide ou null
+     * @param string $query The search query
+     *
+     * @return string|null Valid video ID or null
      */
     private function searchAndFilterVideo(string $query): ?string
     {
@@ -122,11 +127,11 @@ class YoutubeService
     }
 
     /**
-     * Récupère les détails des vidéos via l'API YouTube.
+     * Retrieves video details via the YouTube API.
      *
-     * @param array $videoIds liste d'IDs vidéo
+     * @param array $videoIds List of video IDs
      *
-     * @return array détails vidéos
+     * @return array Video details
      */
     private function getVideosDetails(array $videoIds): array
     {
@@ -144,7 +149,11 @@ class YoutubeService
     }
 
     /**
-     * Convertit une durée ISO 8601 en secondes.
+     * Converts an ISO 8601 duration to seconds.
+     *
+     * @param string $isoDuration The duration in ISO 8601 format
+     *
+     * @return int The duration in seconds
      */
     private function convertISO8601DurationToSeconds(string $isoDuration): int
     {

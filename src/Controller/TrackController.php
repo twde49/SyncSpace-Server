@@ -18,6 +18,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('api/track')]
 final class TrackController extends AbstractController
 {
+    /**
+     * Searches for tracks by a keyword.
+     *
+     * @param Request         $request The HTTP request containing the search query
+     * @param TrackRepository $repo    The track repository
+     *
+     * @return Response JSON response containing the search results
+     */
     #[Route('/search', name: 'app_track_search', methods: ['GET'])]
     public function search(Request $request, TrackRepository $repo): Response
     {
@@ -26,6 +34,14 @@ final class TrackController extends AbstractController
         return $this->json($repo->searchByKeyword($query));
     }
 
+    /**
+     * Suggests tracks based on genre.
+     *
+     * @param Request         $request The HTTP request containing the genre
+     * @param TrackRepository $repo    The track repository
+     *
+     * @return Response JSON response containing suggested tracks
+     */
     #[Route('/suggest', name: 'app_track_suggest', methods: ['GET'])]
     public function suggest(Request $request, TrackRepository $repo): Response
     {
@@ -34,6 +50,14 @@ final class TrackController extends AbstractController
         return $this->json($repo->suggestByGenre($genre));
     }
 
+    /**
+     * Adds a new track.
+     *
+     * @param Request      $request      The HTTP request containing track data
+     * @param TrackService $trackService The track service
+     *
+     * @return Response JSON response containing the added track details
+     */
     #[Route('/add', name: 'add_track', methods: ['POST'])]
     public function addTrack(
         Request $request,
@@ -63,6 +87,13 @@ final class TrackController extends AbstractController
         ]);
     }
 
+    /**
+     * Sets the current track for the user.
+     *
+     * @param Request $request The HTTP request containing track data
+     *
+     * @return Response JSON response indicating the current track was set
+     */
     #[
         Route(
             '/setCurrentTrack',
@@ -76,6 +107,14 @@ final class TrackController extends AbstractController
         $currentUser = $this->getUser();
     }
 
+    /**
+     * Likes or removes a track from user's favorites.
+     *
+     * @param Request                $request The HTTP request containing track data
+     * @param EntityManagerInterface $manager The entity manager
+     *
+     * @return Response JSON response indicating the result of the like/remove action
+     */
     #[Route('/like', name: 'like_track', methods: ['POST'])]
     public function likeTrack(
         Request $request,

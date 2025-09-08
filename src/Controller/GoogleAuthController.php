@@ -17,6 +17,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GoogleAuthController extends AbstractController
 {
+    /**
+     * Constructor for GoogleAuthController.
+     *
+     * @param HttpClientInterface      $httpClient    The HTTP client for API requests
+     * @param EntityManagerInterface   $entityManager The entity manager
+     * @param JWTTokenManagerInterface $jwtManager    The JWT token manager
+     */
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly EntityManagerInterface $entityManager,
@@ -24,6 +31,14 @@ class GoogleAuthController extends AbstractController
     ) {
     }
 
+    /**
+     * Redirects user to Google OAuth login page.
+     */
+    /**
+     * Redirects user to Google OAuth login page.
+     *
+     * @return RedirectResponse Redirects to Google OAuth login
+     */
     #[Route('/api/auth/google', name: 'app_google_login')]
     public function login(): RedirectResponse
     {
@@ -46,6 +61,17 @@ class GoogleAuthController extends AbstractController
         return new RedirectResponse($url);
     }
 
+    /**
+     * Handles Google OAuth callback and authenticates user.
+     */
+    /**
+     * Handles Google OAuth callback and authenticates user.
+     *
+     * @param Request        $request        The HTTP request containing the callback data
+     * @param UserRepository $userRepository The user repository
+     *
+     * @return RedirectResponse Redirects to the application with authentication result
+     */
     #[Route('/api/auth/google/callback', name: 'app_google_callback')]
     public function callback(
         Request $request,

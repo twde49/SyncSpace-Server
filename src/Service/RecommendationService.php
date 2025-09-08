@@ -10,10 +10,27 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RecommendationService
 {
+    /**
+     * Constructor for RecommendationService.
+     *
+     * @param HttpClientInterface $httpClient      The HTTP client for API requests
+     * @param TrackRepository     $trackRepository The track repository
+     * @param YoutubeService      $youtubeService  The YouTube service
+     * @param string              $apiKey          The API key for Last.fm
+     */
     public function __construct(private readonly HttpClientInterface $httpClient, private readonly TrackRepository $trackRepository, private readonly YoutubeService $youtubeService, private readonly string $apiKey)
     {
     }
 
+    /**
+     * Gets the next music recommendation based on artist, track, and offset.
+     *
+     * @param string      $artist The artist name
+     * @param string|null $track  The track name (optional)
+     * @param int         $offset The offset for recommendations
+     *
+     * @return array|null The recommended track data or null if not found
+     */
     public function getNextRecommendation(string $artist, ?string $track = null, int $offset = 0): ?array
     {
         if ($track) {
@@ -51,7 +68,11 @@ class RecommendationService
     }
 
     /**
-     * Hydrate la première recommandation d'un youtubeId et renvoie cette recommandation en tableau.
+     * Hydrates the first recommendation with a YouTube ID and returns it as an array.
+     *
+     * @param array $recommendations Array of recommended tracks
+     *
+     * @return array|null The hydrated recommendation or null if not found
      */
     private function hydrateYoutubeIdForFirst(array $recommendations): ?array
     {
@@ -73,7 +94,13 @@ class RecommendationService
     }
 
     /**
-     * Récupère une liste de recommandations (Track[]) (fonction existante mise à jour).
+     * Gets a list of recommendations (Track[]).
+     *
+     * @param string      $artist The artist name
+     * @param string|null $track  The track name (optional)
+     * @param int         $limit  The number of recommendations to fetch
+     *
+     * @return array Array of recommended tracks
      */
     public function getRecommendations(string $artist, ?string $track = null, int $limit = 10): array
     {
@@ -87,6 +114,15 @@ class RecommendationService
         return $this->fetchSimilarArtistsTopTracks($artist, $limit);
     }
 
+    /**
+     * Fetches similar tracks from Last.fm.
+     *
+     * @param string $artist The artist name
+     * @param string $track  The track name
+     * @param int    $limit  The number of tracks to fetch
+     *
+     * @return array Array of similar tracks
+     */
     private function fetchSimilarTracks(string $artist, string $track, int $limit): array
     {
         $url = 'http://ws.audioscrobbler.com/2.0/';
@@ -107,6 +143,14 @@ class RecommendationService
         return $this->hydrateTracksFromLastFm($similarTracks);
     }
 
+    /**
+     * Fetches top tracks for similar artists from Last.fm.
+     *
+     * @param string $artist The artist name
+     * @param int    $limit  The number of artists to fetch
+     *
+     * @return array Array of top tracks for similar artists
+     */
     private function fetchSimilarArtistsTopTracks(string $artist, int $limit): array
     {
         $url = 'http://ws.audioscrobbler.com/2.0/';
@@ -134,6 +178,13 @@ class RecommendationService
         return $tracks;
     }
 
+    /**
+     * Gets the top track for a given artist from Last.fm.
+     *
+     * @param string $artistName The artist name
+     *
+     * @return Track|null The top track entity or null if not found
+     */
     private function getTopTrackByArtist(string $artistName): ?Track
     {
         $url = 'http://ws.audioscrobbler.com/2.0/';
@@ -164,6 +215,13 @@ class RecommendationService
         return $track;
     }
 
+    /**
+     * Hydrates Track entities from Last.fm track data.
+     *
+     * @param array $tracksData Array of track data from Last.fm
+     *
+     * @return array Array of hydrated Track entities
+     */
     private function hydrateTracksFromLastFm(array $tracksData): array
     {
         $tracks = [];
@@ -179,6 +237,13 @@ class RecommendationService
         return $tracks;
     }
 
+    /**
+     * Gets top tracks for a random tag from Last.fm.
+     *
+     * @param array $tags Array of tags to choose from (optional)
+     *
+     * @return array Array of top tracks for the random tag
+     */
     public function getRandomTagTopTracks(array $tags = []): array
     {
         if (empty($tags)) {
@@ -204,6 +269,11 @@ class RecommendationService
         return $this->hydrateTracksFromLastFm($tracksData);
     }
 
+    /**
+     * Gets a discovery track recommendation.
+     *
+     * @return array|null The recommended discovery track or null if not found
+     */
     public function getDiscoverRecommendation(): ?array
     {
         $tracks = $this->getRandomTagTopTracks();
@@ -226,6 +296,14 @@ class RecommendationService
         return null;
     }
 
+    /**
+     * Hydrates a recommendation at a specific offset with a YouTube ID.
+     *
+     * @param array $recommendations Array of recommended tracks
+     * @param int   $offset          The offset to hydrate
+     *
+     * @return array|null The hydrated recommendation or null if not found
+     */
     public function hydrateYoutubeIdAtOffset(array $recommendations, int $offset): ?array
     {
         if (!isset($recommendations[$offset])) {

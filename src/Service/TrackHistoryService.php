@@ -11,10 +11,21 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class TrackHistoryService
 {
+    /**
+     * Constructor for TrackHistoryService.
+     *
+     * @param EntityManagerInterface $em The entity manager
+     */
     public function __construct(private readonly EntityManagerInterface $em)
     {
     }
 
+    /**
+     * Adds a track to the user's history.
+     *
+     * @param User $user    The user entity
+     * @param int  $trackId The ID of the track to add
+     */
     public function addTrackToHistory(User $user, int $trackId): void
     {
         $track = $this->em->getRepository(Track::class)->find($trackId);
@@ -31,6 +42,13 @@ class TrackHistoryService
         $this->em->flush();
     }
 
+    /**
+     * Gets the track history for a user.
+     *
+     * @param User $user The user entity
+     *
+     * @return array The user's track history
+     */
     public function getUserHistory(User $user): array
     {
         return $this->em->getRepository(TrackHistory::class)

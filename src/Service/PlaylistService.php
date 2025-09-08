@@ -16,7 +16,12 @@ class PlaylistService
     }
 
     /**
-     * @param string $name
+     * Creates a new playlist for the user.
+     *
+     * @param User   $user The user entity
+     * @param string $name The name of the playlist
+     *
+     * @return Playlist The created playlist entity
      */
     public function createPlaylist(User $user, $name): Playlist
     {
@@ -32,8 +37,10 @@ class PlaylistService
     }
 
     /**
-     * @param int $playlistId
-     * @param int $trackId
+     * Adds a track to a playlist.
+     *
+     * @param int $playlistId The ID of the playlist
+     * @param int $trackId    The YouTube ID of the track
      */
     public function addTrackToPlaylist($playlistId, $trackId): void
     {
