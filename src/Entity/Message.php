@@ -55,6 +55,10 @@ class Message
     #[Groups('conversation:read')]
     private ?string $fileSize = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups('conversation:read')]
+    private ?int $noteId = null;
+
     public function __construct()
     {
         $this->sentAt = new \DateTimeImmutable();
@@ -171,6 +175,18 @@ class Message
     public function setFileSize(?string $filesize): static
     {
         $this->fileSize = $filesize;
+
+        return $this;
+    }
+
+    public function getNoteId(): ?int
+    {
+        return $this->noteId;
+    }
+
+    public function setNoteId(?int $noteId): static
+    {
+        $this->noteId = $noteId;
 
         return $this;
     }

@@ -50,6 +50,12 @@ class NoteController extends AbstractController
         return $this->json($repository->findNotesAscOrderByUser($user), Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
     }
 
+    #[Route('/{id}', name: 'index_note_find', methods: 'GET')]
+    public function findNote(Note $note): Response
+    {
+        return $this->json($note, Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
+    }
+
     #[Route('s/shared', name: 'shared_index_note', methods: 'GET')]
     public function indexSharedNotes(NoteRepository $repository): Response
     {
@@ -177,6 +183,7 @@ class NoteController extends AbstractController
         $message->setSentAt(new \DateTimeImmutable());
         $message->setConversation($conversation);
         $message->setType('note');
+        $message->setNoteId($note->getId());
 
         foreach ($userIds as $userId) {
             $user = $userRepository->find($userId);
