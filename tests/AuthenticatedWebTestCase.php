@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Entity\User;
+use App\Entity\UserSettings;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -12,7 +13,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthenticatedWebTestCase extends WebTestCase
 {
-    protected static ?KernelBrowser $client = null;
+    protected ?KernelBrowser $client = null;
 
     protected function setUp(): void
     {
@@ -36,11 +37,8 @@ class AuthenticatedWebTestCase extends WebTestCase
 
     protected function createAuthenticatedClient(string $password = 'password'): KernelBrowser
     {
-        if (null === self::$client) {
-            self::$client = static::createClient();
-        }
-
-        $container = self::$client->getContainer();
+        $this->client = static::createClient();
+        $container = $this->client->getContainer();
 
         /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine.orm.entity_manager');
@@ -54,11 +52,14 @@ class AuthenticatedWebTestCase extends WebTestCase
         $user->setLastName('test');
         $user->setRoles(['ROLE_USER']);
         $user->setIsValidated(true);
+        $userSettings = new UserSettings();
+        $user->setUserSettings($userSettings);
+        $em->persist($userSettings);
         $user->setPassword($passwordHasher->hashPassword($user, $password));
         $em->persist($user);
         $em->flush();
 
-        self::$client->request(
+        $this->client->request(
             'POST',
             '/api/login_check',
             [],
@@ -70,15 +71,22 @@ class AuthenticatedWebTestCase extends WebTestCase
             ])
         );
 
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        self::$client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isSuccessful(), 'Login request failed: ' . $response->getContent());
+        
+        $content = $response->getContent();
+        $this->assertJson($content);
+        $data = json_decode($content, true);
+        $this->assertArrayHasKey('token', $data, 'Login response does not contain a token: ' . $content);
+        $this->client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
 
-        return self::$client;
+        return $this->client;
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
         $this->runCommand('doctrine:database:drop --env=test --force --if-exists');
+        $this->client = null;
     }
 }

@@ -65,19 +65,4 @@ class UserManagementControllerTest extends WebTestCase
 
         self::assertNotNull($this->userRepository->findBy(['email' => $this->userTestData['email']]));
     }
-
-    public function testLoginApi(): void
-    {
-        dump('2', $this->userTestData);
-        $this->client->request('POST', '/api/login_check', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(
-            ['username' => $this->userTestData['email'], 'password' => $this->userTestData['password']]
-        ));
-
-        $response = $this->client->getResponse();
-
-        $this->assertEquals(200, $response->getStatusCode(), 'Login check should return HTTP 200');
-
-        $data = json_decode($response->getContent(), true);
-        $this->assertArrayHasKey('token', $data, 'Response should contain a JWT token');
-    }
 }

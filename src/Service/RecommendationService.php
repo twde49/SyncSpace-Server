@@ -94,7 +94,7 @@ class RecommendationService
             'method' => 'track.getsimilar',
             'artist' => $artist,
             'track' => $track,
-            'api_key' => $this->lastFmApiKey,
+            'api_key' => $this->apiKey,
             'format' => 'json',
             'limit' => $limit,
         ];
@@ -113,7 +113,7 @@ class RecommendationService
         $params = [
             'method' => 'artist.getsimilar',
             'artist' => $artist,
-            'api_key' => $this->lastFmApiKey,
+            'api_key' => $this->apiKey,
             'format' => 'json',
             'limit' => $limit,
         ];
@@ -140,7 +140,7 @@ class RecommendationService
         $params = [
             'method' => 'artist.gettoptracks',
             'artist' => $artistName,
-            'api_key' => $this->lastFmApiKey,
+            'api_key' => $this->apiKey,
             'format' => 'json',
             'limit' => 1,
         ];
@@ -191,7 +191,7 @@ class RecommendationService
         $params = [
             'method' => 'tag.gettoptracks',
             'tag' => $randomTag,
-            'api_key' => $this->lastFmApiKey,
+            'api_key' => $this->apiKey,
             'format' => 'json',
             'limit' => 20,
         ];
