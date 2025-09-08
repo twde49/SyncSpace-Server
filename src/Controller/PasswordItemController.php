@@ -29,6 +29,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class PasswordItemController extends AbstractController
 {
     /**
+     * Adds a new password item for the authenticated user.
+     *
      * @throws RandomException
      */
     #[Route('/add', methods: ['POST'])]
@@ -56,6 +58,16 @@ class PasswordItemController extends AbstractController
         return $this->json(['message' => 'Mot de passe ajouté avec succès'], 201);
     }
 
+    /**
+     * Lists all password items for the authenticated user.
+     */
+    /**
+     * Lists all password items for the authenticated user.
+     *
+     * @param PasswordItemRepository $passwordRepo The password item repository
+     *
+     * @return Response JSON response containing the user's password items
+     */
     #[Route('/list', methods: ['GET'])]
     public function listPasswords(PasswordItemRepository $passwordRepo): Response
     {
@@ -81,6 +93,17 @@ class PasswordItemController extends AbstractController
         return $this->json($response);
     }
 
+    /**
+     * Sets the master password for the authenticated user.
+     */
+    /**
+     * Sets the master password for the authenticated user.
+     *
+     * @param Request                $request The HTTP request containing the master password
+     * @param EntityManagerInterface $em      The entity manager
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/set-master-password', methods: ['POST'])]
     public function setMasterPassword(Request $request, EntityManagerInterface $em): Response
     {
@@ -99,6 +122,14 @@ class PasswordItemController extends AbstractController
         return $this->json(['message' => 'Master password set successfully'], 201);
     }
 
+    /**
+     * Retrieves the master password hash for the authenticated user.
+     */
+    /**
+     * Retrieves the master password hash for the authenticated user.
+     *
+     * @return Response JSON response containing the master password hash
+     */
     #[Route('/get-master-password-hash', methods: ['GET'])]
     public function getMasterPasswordHash(): Response
     {
@@ -110,6 +141,16 @@ class PasswordItemController extends AbstractController
         ]);
     }
 
+    /**
+     * Counts the number of password items and compromised passwords for the authenticated user.
+     */
+    /**
+     * Counts the number of password items and compromised passwords for the authenticated user.
+     *
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response containing password counts
+     */
     #[Route('/count', methods: ['GET'])]
     public function howManyPasswords(EntityManagerInterface $entityManager): Response
     {
@@ -134,6 +175,18 @@ class PasswordItemController extends AbstractController
         ]);
     }
 
+    /**
+     * Updates a specific password item for the authenticated user.
+     */
+    /**
+     * Updates a specific password item for the authenticated user.
+     *
+     * @param PasswordItem|null      $passwordItem The password item to update
+     * @param Request                $request      The HTTP request containing update data
+     * @param EntityManagerInterface $em           The entity manager
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/update/{id}', methods: ['PATCH'])]
     public function updatePasswordItem(?PasswordItem $passwordItem, Request $request, EntityManagerInterface $em): Response
     {
@@ -180,6 +233,17 @@ class PasswordItemController extends AbstractController
         return $this->json(['message' => 'Mot de passe mis à jour avec succès']);
     }
 
+    /**
+     * Removes a specific password item for the authenticated user.
+     */
+    /**
+     * Removes a specific password item for the authenticated user.
+     *
+     * @param PasswordItem|null      $passwordItem  The password item to remove
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/remove/{id}', methods: ['DELETE'])]
     public function removePasswordItem(?PasswordItem $passwordItem, EntityManagerInterface $entityManager): Response
     {
@@ -197,6 +261,17 @@ class PasswordItemController extends AbstractController
         return $this->json('Mot de passe supprimé avec succès');
     }
 
+    /**
+     * Toggles the favorite status of a specific password item.
+     */
+    /**
+     * Toggles the favorite status of a specific password item.
+     *
+     * @param PasswordItem|null      $passwordItem  The password item to toggle
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/toggle-favorite/{id}', methods: ['PATCH'])]
     public function toggleFavoritePasswordItem(?PasswordItem $passwordItem, EntityManagerInterface $entityManager): Response
     {

@@ -14,6 +14,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/settings')]
 class UserSettingsController extends AbstractController
 {
+    /**
+     * Enables or disables notifications for the current user.
+     *
+     * @param Request                $request       The HTTP request containing notification settings
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating the result
+     */
     #[
         Route(
             '/enable-disable-notifications',
@@ -41,6 +49,14 @@ class UserSettingsController extends AbstractController
         ]);
     }
 
+    /**
+     * Enables or disables geolocation for the current user.
+     *
+     * @param Request                $request       The HTTP request containing geolocation settings
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating the result
+     */
     #[
         Route(
             '/enable-disable-geolocation',
@@ -68,6 +84,14 @@ class UserSettingsController extends AbstractController
         ]);
     }
 
+    /**
+     * Updates the theme preference for the current user.
+     *
+     * @param Request                $request       The HTTP request containing theme preference
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating the result
+     */
     #[
         Route(
             '/update-theme-preference',
@@ -93,6 +117,14 @@ class UserSettingsController extends AbstractController
         ]);
     }
 
+    /**
+     * Updates the current track for the user.
+     *
+     * @param Request                $request The HTTP request containing track data
+     * @param EntityManagerInterface $manager The entity manager
+     *
+     * @return Response JSON response indicating the result
+     */
     #[
         Route(
             '/update-current-track',
@@ -122,6 +154,11 @@ class UserSettingsController extends AbstractController
         ]);
     }
 
+    /**
+     * Gets the current track for the user.
+     *
+     * @return Response JSON response containing the current track or error message
+     */
     #[
         Route(
             '/current-track',

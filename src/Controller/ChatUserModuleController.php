@@ -28,11 +28,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('api')]
 class ChatUserModuleController extends AbstractController
 {
+    /**
+     * Constructor for ChatUserModuleController.
+     */
     public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ParameterBagInterface $params)
     {
     }
 
     /**
+     * Creates a new conversation between users.
+     *
      * @throws GuzzleException
      */
     #[
@@ -116,7 +121,7 @@ class ChatUserModuleController extends AbstractController
                     'Nouvelle conversation avec '.
                         implode(
                             ', ',
-                            array_map(fn($user) => $user->getFirstName().
+                            array_map(fn ($user) => $user->getFirstName().
                                 ' '.
                                 $user->getLastName(), $conversation->getUsers()->toArray())
                         ),
@@ -136,6 +141,9 @@ class ChatUserModuleController extends AbstractController
         );
     }
 
+    /**
+     * Shows details of a specific conversation.
+     */
     #[Route('/conversation/{id}', name: 'show_conversation', methods: ['GET'])]
     public function showConversation(?Conversation $conversation): Response
     {
@@ -151,6 +159,9 @@ class ChatUserModuleController extends AbstractController
         );
     }
 
+    /**
+     * Shows all conversations for the current user.
+     */
     #[Route('/conversations', name: 'show_all_conversations', methods: ['GET'])]
     public function showAllConversations(
         UserRepository $userRepository,
@@ -174,6 +185,9 @@ class ChatUserModuleController extends AbstractController
         );
     }
 
+    /**
+     * Deletes a conversation.
+     */
     #[
         Route(
             '/conversation/remove/{id}',
@@ -200,6 +214,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json(['message' => 'Conversation deleted'], 200);
     }
 
+    /**
+     * Edits a conversation's details.
+     */
     #[
         Route(
             '/conversation/edit/{id}',
@@ -231,6 +248,8 @@ class ChatUserModuleController extends AbstractController
     }
 
     /**
+     * Sends a new message in a conversation.
+     *
      * @throws GuzzleException
      */
     #[
@@ -307,6 +326,8 @@ class ChatUserModuleController extends AbstractController
     }
 
     /**
+     * Sends an audio message in a conversation.
+     *
      * @throws GuzzleException
      */
     #[
@@ -391,6 +412,8 @@ class ChatUserModuleController extends AbstractController
     }
 
     /**
+     * Sends an image message in a conversation.
+     *
      * @throws GuzzleException
      */
     #[
@@ -474,6 +497,8 @@ class ChatUserModuleController extends AbstractController
     }
 
     /**
+     * Sends a file message in a conversation.
+     *
      * @throws GuzzleException
      */
     #[
@@ -558,6 +583,8 @@ class ChatUserModuleController extends AbstractController
     }
 
     /**
+     * Sends a GIF message in a conversation.
+     *
      * @throws GuzzleException
      */
     #[
@@ -633,6 +660,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json($response, Response::HTTP_CREATED);
     }
 
+    /**
+     * Deletes a message from a conversation.
+     */
     #[
         Route(
             '/conversation/message/remove/{id}',
@@ -671,6 +701,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json(['message' => 'Message deleted'], 200);
     }
 
+    /**
+     * Edits a message in a conversation.
+     */
     #[
         Route(
             '/conversation/message/edit/{id}',
@@ -709,6 +742,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json(['message' => 'Message updated'], 200);
     }
 
+    /**
+     * Searches for users by username.
+     */
     #[
         Route(
             '/conversation/user/search',
@@ -727,6 +763,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json($searchedResult, 200, [], ['groups' => 'user:read']);
     }
 
+    /**
+     * Sets a user as online by email.
+     */
     #[Route('/user/setOnline/{email}', methods: ['PUT'])]
     public function setOnline(string $email, UserRepository $userRepository): Response
     {
@@ -741,6 +780,9 @@ class ChatUserModuleController extends AbstractController
         return $this->json(['message' => 'User set online'], 200);
     }
 
+    /**
+     * Sets a user as offline by email.
+     */
     #[Route('/user/setOffline/{email}', methods: ['PUT'])]
     public function setOffline(string $email, UserRepository $userRepository): Response
     {

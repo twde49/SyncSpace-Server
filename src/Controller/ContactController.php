@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/contact')]
 class ContactController extends AbstractController
 {
+    /**
+     * Retrieves contact data from the request query.
+     */
     #[Route('/', name: 'app_contact', methods: ['POST'])]
     public function getContact(Request $request): Response
     {

@@ -15,9 +15,12 @@ class LastFmService
     }
 
     /**
-     * Récupère une liste d'artistes similaires à un artiste donné.
+     * Retrieves a list of artists similar to a given artist.
      *
-     * @return array ['name' => string, 'match' => float, 'url' => string, ...]
+     * @param string $artist The name of the artist
+     * @param int    $limit  The maximum number of similar artists to retrieve
+     *
+     * @return array List of similar artists ['name' => string, 'match' => float, 'url' => string, ...]
      */
     public function getSimilarArtists(string $artist, int $limit = 10): array
     {
@@ -37,7 +40,13 @@ class LastFmService
     }
 
     /**
-     * Récupère des pistes similaires à une piste donnée.
+     * Retrieves tracks similar to a given track.
+     *
+     * @param string $artist The name of the artist
+     * @param string $track  The name of the track
+     * @param int    $limit  The maximum number of similar tracks to retrieve
+     *
+     * @return array List of similar tracks
      */
     public function getSimilarTracks(string $artist, string $track, int $limit = 10): array
     {

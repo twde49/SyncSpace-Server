@@ -10,7 +10,11 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 class MailerService
 {
     /**
-     * @return TemplatedEmail
+     * Sends a verification email to the specified user.
+     *
+     * @param User $user The user entity to send the verification email to
+     *
+     * @return TemplatedEmail The templated email object
      */
     public function sendVerificationMail(User $user)
     {

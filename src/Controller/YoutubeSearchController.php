@@ -14,6 +14,15 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/music/youtube')]
 class YoutubeSearchController extends AbstractController
 {
+    /**
+     * Searches YouTube for tracks based on a query.
+     *
+     * @param Request              $request              The HTTP request containing the search query
+     * @param YoutubeService       $youtubeService       The YouTube service for searching videos
+     * @param FavoriteTrackService $favoriteTrackService The favorite track service
+     *
+     * @return Response JSON response containing the search results
+     */
     #[Route('/search', name: 'app_youtube_search', methods: ['GET'])]
     public function search(Request $request, YoutubeService $youtubeService, FavoriteTrackService $favoriteTrackService): Response
     {

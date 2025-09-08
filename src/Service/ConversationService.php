@@ -8,6 +8,13 @@ use App\Entity\Conversation;
 
 class ConversationService
 {
+    /**
+     * Sets the latest active user for a conversation based on the most recent message.
+     *
+     * @param Conversation $conversation The conversation entity
+     *
+     * @return Conversation The updated conversation entity
+     */
     public function setLatestActiveUser(Conversation $conversation): Conversation
     {
         $latestMessage = null;
@@ -23,6 +30,11 @@ class ConversationService
         return $conversation->setLastActiveUser(null);
     }
 
+    /**
+     * Sets the latest message for a conversation.
+     *
+     * @param Conversation $conversation The conversation entity
+     */
     public function setLatestMessage(Conversation $conversation): void
     {
         $messages = $conversation->getMessages();

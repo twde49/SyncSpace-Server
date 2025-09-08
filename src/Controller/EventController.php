@@ -21,10 +21,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/events')]
 class EventController extends AbstractController
 {
+    /**
+     * Constructor for EventController.
+     */
     public function __construct(private readonly ParameterBagInterface $params)
     {
     }
 
+    /**
+     * Returns all events related to the current user.
+     */
     #[Route('/all', name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
@@ -39,6 +45,9 @@ class EventController extends AbstractController
         return $this->json($concernedEvents, 200, [], ['groups' => 'event:read']);
     }
 
+    /**
+     * Creates a new event.
+     */
     #[Route('/create', name: 'app_event_create', methods: ['POST'])]
     public function createEvent(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, UserRepository $userRepository, NotificationService $notificationService): Response
     {
@@ -76,6 +85,9 @@ class EventController extends AbstractController
         return $this->json($newEvent, Response::HTTP_CREATED, [], ['groups' => ['event:read']]);
     }
 
+    /**
+     * Removes an event.
+     */
     #[Route('/remove/{id}', name: 'app_event_remove', methods: ['DELETE'])]
     public function removeEvent(?Event $event, EntityManagerInterface $manager): Response
     {
@@ -93,6 +105,9 @@ class EventController extends AbstractController
         return $this->json('Successfully removed event', Response::HTTP_OK);
     }
 
+    /**
+     * Updates an event.
+     */
     #[Route('/update/{id}', name: 'app_event_update', methods: ['PUT'])]
     public function updateEvent(?Event $event, Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, UserRepository $userRepository, NotificationService $notificationService): Response
     {

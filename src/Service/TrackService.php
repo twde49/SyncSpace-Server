@@ -15,6 +15,13 @@ class TrackService
 
     /**
      * Crée ou récupère un track selon le youtubeId (évite doublons).
+     *
+     * @param string $youtubeId L'identifiant YouTube du track
+     * @param string $title     Le titre du track
+     * @param string $artist    L'artiste du track (optionnel)
+     * @param string $genre     Le genre du track (optionnel)
+     *
+     * @return Track Le track créé ou récupéré
      */
     public function createOrGetTrack(string $youtubeId, string $title, string $artist = '', string $genre = ''): Track
     {

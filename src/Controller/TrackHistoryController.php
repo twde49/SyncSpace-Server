@@ -14,6 +14,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/music/history')]
 class TrackHistoryController extends AbstractController
 {
+    /**
+     * Lists the track history for the current user.
+     *
+     * @param TrackHistoryService $service The track history service
+     *
+     * @return Response JSON response containing the user's track history
+     */
     #[Route('', name: 'app_track_history_list', methods: ['GET'])]
     public function list(TrackHistoryService $service): Response
     {
@@ -24,6 +31,14 @@ class TrackHistoryController extends AbstractController
         return $this->json($history);
     }
 
+    /**
+     * Adds a track to the user's history.
+     *
+     * @param Request             $request             The HTTP request containing the track ID
+     * @param TrackHistoryService $trackHistoryService The track history service
+     *
+     * @return Response JSON response indicating the track was added to history
+     */
     #[Route('/add', name: 'history_add_track', methods: ['POST'])]
     public function addTrack(Request $request, TrackHistoryService $trackHistoryService): Response
     {

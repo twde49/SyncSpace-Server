@@ -12,10 +12,22 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RecommendationController extends AbstractController
 {
+    /**
+     * Constructor for RecommendationController.
+     *
+     * @param RecommendationService $recommendationService The recommendation service
+     */
     public function __construct(private readonly RecommendationService $recommendationService)
     {
     }
 
+    /**
+     * Returns a music recommendation based on artist, track, and offset.
+     *
+     * @param Request $request The HTTP request containing query parameters
+     *
+     * @return JsonResponse JSON response with the music recommendation
+     */
     #[Route('/api/recommendations', name: 'api_recommendations', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
@@ -46,6 +58,13 @@ class RecommendationController extends AbstractController
         return $this->json($recommendation);
     }
 
+    /**
+     * Returns a discovery track recommendation.
+     *
+     * @param Request $request The HTTP request
+     *
+     * @return JsonResponse JSON response with the discovery track recommendation
+     */
     #[Route('/api/discover', name: 'api_discover', methods: ['GET'])]
     public function discover(Request $request): JsonResponse
     {

@@ -15,6 +15,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/music')]
 class MusicController extends AbstractController
 {
+    /**
+     * Retrieves all playlists for the current user.
+     *
+     * @param PlaylistRepository $playlistRepository The playlist repository
+     *
+     * @return Response JSON response containing the user's playlists
+     */
     #[Route('/playlists', name: 'app_music_playlist_show')]
     public function getPlaylists(PlaylistRepository $playlistRepository): Response
     {
@@ -25,6 +32,14 @@ class MusicController extends AbstractController
         return $this->json($allPlaylists, 200, [], ['groups' => 'playlistSmallRead']);
     }
 
+    /**
+     * Creates a new playlist for the current user.
+     *
+     * @param Request         $request The HTTP request containing playlist data
+     * @param PlaylistService $service The playlist service
+     *
+     * @return Response JSON response indicating playlist creation status
+     */
     #[Route('/playlist/create', name: 'app_music_playlist_create')]
     public function createPlaylist(Request $request, PlaylistService $service): Response
     {

@@ -16,6 +16,14 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/music/playlist')]
 class PlaylistController extends AbstractController
 {
+    /**
+     * Adds a track to a playlist.
+     *
+     * @param Request         $request         The HTTP request containing playlist and track IDs
+     * @param PlaylistService $playlistService The playlist service
+     *
+     * @return Response JSON response indicating the track was added to the playlist
+     */
     #[Route('/add-track', name: 'playlist_add_track', methods: ['POST'])]
     public function addTrack(Request $request, PlaylistService $playlistService): Response
     {
@@ -30,6 +38,11 @@ class PlaylistController extends AbstractController
         return $this->json(['status' => 'Track added to playlist']);
     }
 
+    /**
+     * Retrieves all playlists for the current user.
+     *
+     * @return Response JSON response containing the user's playlists
+     */
     #[Route('/index', name: 'playlist_index', methods: ['GET'])]
     public function getPlaylists(): Response
     {
@@ -39,6 +52,14 @@ class PlaylistController extends AbstractController
         return $this->json($user->getPlaylists(), Response::HTTP_OK, [], ['groups' => 'playlist:read']);
     }
 
+    /**
+     * Creates a new playlist for the current user.
+     *
+     * @param Request         $request         The HTTP request containing the playlist name
+     * @param PlaylistService $playlistService The playlist service
+     *
+     * @return Response JSON response indicating the playlist was created
+     */
     #[Route('/new', name: 'playlist_create', methods: ['POST'])]
     public function createPlaylist(Request $request, PlaylistService $playlistService): Response
     {
@@ -56,6 +77,11 @@ class PlaylistController extends AbstractController
         return $this->json(['status' => 'Playlist created']);
     }
 
+    /**
+     * Gets the quantity of playlists for the current user.
+     *
+     * @return Response JSON response containing the quantity of playlists
+     */
     #[Route('/quantity', name: 'playlist_quantity', methods: ['GET'])]
     public function getPlaylistQuantity(): Response
     {
@@ -65,6 +91,13 @@ class PlaylistController extends AbstractController
         return $this->json(['quantity' => count($user->getPlaylists())], Response::HTTP_OK);
     }
 
+    /**
+     * Retrieves tracks from a specific playlist.
+     *
+     * @param Playlist|null $playlist The playlist entity or null if not found
+     *
+     * @return Response JSON response containing the playlist tracks or error
+     */
     #[Route('/{id}', name: 'playlist_get_tracks', methods: ['GET'])]
     public function getPlaylistTracks(?Playlist $playlist): Response
     {
@@ -86,6 +119,14 @@ class PlaylistController extends AbstractController
         return $this->json($playlist->getTracks(), Response::HTTP_OK, [], ['groups' => 'playlist:read']);
     }
 
+    /**
+     * Removes a playlist for the current user.
+     *
+     * @param Playlist|null          $playlist      The playlist entity or null if not found
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating the playlist was removed or error
+     */
     #[Route('/remove/{id}', name: 'playlist_remove', methods: ['DELETE'])]
     public function removePlaylist(?Playlist $playlist, EntityManagerInterface $entityManager): Response
     {
@@ -106,6 +147,15 @@ class PlaylistController extends AbstractController
         return $this->json(['status' => 'Playlist removed']);
     }
 
+    /**
+     * Updates the name of a playlist for the current user.
+     *
+     * @param Playlist|null          $playlist      The playlist entity or null if not found
+     * @param Request                $request       The HTTP request containing the new name
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response indicating the playlist was updated or error
+     */
     #[Route('/update/{id}', name: 'playlist_update', methods: ['PUT'])]
     public function updatePlaylist(?Playlist $playlist, Request $request, EntityManagerInterface $entityManager): Response
     {

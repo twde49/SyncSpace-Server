@@ -16,6 +16,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/notifications')]
 class NotificationController extends AbstractController
 {
+    /**
+     * Returns unread notifications for the current user.
+     *
+     * @param NotificationRepository $notificationRepository The notification repository
+     *
+     * @return Response JSON response containing unread notifications
+     */
     #[Route('/all', name: 'app_notification_index', methods: ['GET'])]
     public function index(NotificationRepository $notificationRepository): Response
     {
@@ -26,6 +33,15 @@ class NotificationController extends AbstractController
         return $this->json($notifications, Response::HTTP_OK, [], ['groups' => ['notification:read']]);
     }
 
+    /**
+     * Creates a new notification for a user.
+     *
+     * @param Request                $request        The HTTP request containing notification data
+     * @param UserRepository         $userRepository The user repository
+     * @param EntityManagerInterface $manager        The entity manager
+     *
+     * @return Response JSON response containing the created notification
+     */
     #[Route('/new', name: 'app_notification_create', methods: ['POST'])]
     public function createNotification(Request $request, UserRepository $userRepository, EntityManagerInterface $manager): Response
     {
@@ -42,6 +58,14 @@ class NotificationController extends AbstractController
         return $this->json($notification, Response::HTTP_CREATED, [], ['groups' => ['notification:read']]);
     }
 
+    /**
+     * Marks a notification as read.
+     *
+     * @param Notification           $notification The notification entity to mark as read
+     * @param EntityManagerInterface $manager      The entity manager
+     *
+     * @return Response JSON response containing the updated notification
+     */
     #[Route('/{id}/read', name: 'app_notification_read', methods: ['PUT'])]
     public function readNotification(Notification $notification, EntityManagerInterface $manager): Response
     {
@@ -51,6 +75,14 @@ class NotificationController extends AbstractController
         return $this->json($notification, Response::HTTP_OK, [], ['groups' => ['notification:read']]);
     }
 
+    /**
+     * Marks all notifications for the current user as read.
+     *
+     * @param EntityManagerInterface $manager                The entity manager
+     * @param NotificationRepository $notificationRepository The notification repository
+     *
+     * @return Response JSON response indicating all notifications are read
+     */
     #[Route('/readAll', name: 'app_notification_read_all', methods: ['PUT'])]
     public function readAllNotifications(EntityManagerInterface $manager, NotificationRepository $notificationRepository): Response
     {

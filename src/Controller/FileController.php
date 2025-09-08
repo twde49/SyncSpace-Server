@@ -55,6 +55,19 @@ class FileController extends AbstractController
         'image/heif',
     ];
 
+    /**
+     * Uploads a file to a folder or root.
+     */
+    /**
+     * Uploads a file to a folder or root.
+     *
+     * @param Request                $request        The HTTP request containing the file
+     * @param EntityManagerInterface $manager        The entity manager
+     * @param int|null               $folderId       The ID of the folder to upload to (optional)
+     * @param FileRepository         $fileRepository The file repository
+     *
+     * @return Response JSON response with the uploaded file data
+     */
     #[Route('/upload/{folderId}', name: 'app_file_upload_to_folder', methods: ['POST'])]
     #[Route('/upload', name: 'app_file_upload', methods: ['POST'])]
     public function upload(
@@ -102,6 +115,14 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets all files from the current user.
+     */
+    /**
+     * Gets all files from the current user.
+     *
+     * @return Response JSON response with all files for the user
+     */
     #[Route('/all', name: 'app_file_get_files_from_user', methods: ['GET'])]
     public function getFilesFromUser(): Response
     {
@@ -121,6 +142,16 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Downloads a file by its ID.
+     */
+    /**
+     * Downloads a file by its ID.
+     *
+     * @param File|null $fileDownloadable The file entity to download
+     *
+     * @return Response The file download response
+     */
     #[Route('/download/{id}', name: 'app_file_download', methods: ['GET'])]
     public function downloadDocument(
         ?File $fileDownloadable,
@@ -138,6 +169,17 @@ class FileController extends AbstractController
         return $this->file($file, $fileDownloadable->getOriginalName());
     }
 
+    /**
+     * Removes a file by its ID.
+     */
+    /**
+     * Removes a file by its ID.
+     *
+     * @param File|null              $file    The file entity to remove
+     * @param EntityManagerInterface $manager The entity manager
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/remove/{id}', name: 'app_file_delete', methods: ['DELETE'])]
     public function removeFile(?File $file, EntityManagerInterface $manager): Response
     {
@@ -158,6 +200,19 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Shares a file with specified users.
+     */
+    /**
+     * Shares a file with specified users.
+     *
+     * @param File|null              $file           The file entity to share
+     * @param Request                $request        The HTTP request containing user IDs
+     * @param EntityManagerInterface $manager        The entity manager
+     * @param UserRepository         $userRepository The user repository
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/share/{id}', name: 'app_file_share', methods: ['POST'])]
     public function shareFile(?File $file, Request $request, EntityManagerInterface $manager, UserRepository $userRepository): Response
     {
@@ -185,6 +240,19 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Revokes file access for specified users.
+     */
+    /**
+     * Revokes file access for specified users.
+     *
+     * @param File|null              $file           The file entity to revoke access
+     * @param Request                $request        The HTTP request containing user IDs
+     * @param EntityManagerInterface $manager        The entity manager
+     * @param UserRepository         $userRepository The user repository
+     *
+     * @return Response JSON response indicating success or error
+     */
     #[Route('/revoke/{id}', name: 'app_file_revoke', methods: ['POST'])]
     public function revokeFileAccess(?File $file, Request $request, EntityManagerInterface $manager, UserRepository $userRepository): Response
     {
@@ -212,6 +280,16 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets file data by its ID.
+     */
+    /**
+     * Gets file data by its ID.
+     *
+     * @param File|null $file The file entity to show
+     *
+     * @return Response JSON response with file data or error
+     */
     #[Route('/show/{id}', name: 'app_file_data', methods: ['GET'])]
     public function getFileData(?File $file): Response
     {
@@ -231,6 +309,14 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets the most recent files for the current user.
+     */
+    /**
+     * Gets the most recent files for the current user.
+     *
+     * @return Response JSON response with recent files
+     */
     #[Route('/recent', name: 'app_file_recent', methods: ['GET'])]
     public function getRecentFiles(): Response
     {
@@ -244,7 +330,7 @@ class FileController extends AbstractController
         );
 
         $sortedFiles = $allFiles->toArray();
-        usort($sortedFiles, fn($a, $b) => $b->getUploadedAt() <=> $a->getUploadedAt());
+        usort($sortedFiles, fn ($a, $b) => $b->getUploadedAt() <=> $a->getUploadedAt());
 
         $recentFiles = array_slice($sortedFiles, 0, 5);
 
@@ -256,6 +342,14 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets all folders for the current user.
+     */
+    /**
+     * Gets all folders for the current user.
+     *
+     * @return Response JSON response with folder files
+     */
     #[Route('/folders', name: 'app_file_folders_index', methods: ['GET'])]
     public function getFoldersFiles(): Response
     {
@@ -270,7 +364,7 @@ class FileController extends AbstractController
 
         $sortedFiles = $allFiles->toArray();
 
-        $foldersFile = array_filter($sortedFiles, fn($file) => $file->isFolder());
+        $foldersFile = array_filter($sortedFiles, fn ($file) => $file->isFolder());
         $foldersFile = array_values($foldersFile);
 
         return $this->json(
@@ -281,6 +375,14 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets all document files for the current user.
+     */
+    /**
+     * Gets all document files for the current user.
+     *
+     * @return Response JSON response with document files
+     */
     #[Route('/documents', name: 'app_file_documents_index', methods: ['GET'])]
     public function getDocumentsFiles(): Response
     {
@@ -295,7 +397,7 @@ class FileController extends AbstractController
 
         $sortedFiles = $allFiles->toArray();
 
-        $documentsFile = array_filter($sortedFiles, fn($file) => in_array($file->getMimeType(), self::DOCUMENT_MIME_TYPES, true));
+        $documentsFile = array_filter($sortedFiles, fn ($file) => in_array($file->getMimeType(), self::DOCUMENT_MIME_TYPES, true));
         $documentsFile = array_values($documentsFile);
 
         return $this->json(
@@ -306,6 +408,14 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets all image files for the current user.
+     */
+    /**
+     * Gets all image files for the current user.
+     *
+     * @return Response JSON response with image files
+     */
     #[Route('/images', name: 'app_file_images_index', methods: ['GET'])]
     public function getImagesFiles(): Response
     {
@@ -320,7 +430,7 @@ class FileController extends AbstractController
 
         $sortedFiles = $allFiles->toArray();
 
-        $imagesFile = array_filter($sortedFiles, fn($file) => in_array($file->getMimeType(), self::IMAGE_MIME_TYPES, true));
+        $imagesFile = array_filter($sortedFiles, fn ($file) => in_array($file->getMimeType(), self::IMAGE_MIME_TYPES, true));
         $imagesFile = array_values($imagesFile);
 
         return $this->json(
@@ -331,6 +441,18 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Creates a new folder for the current user.
+     */
+    /**
+     * Creates a new folder for the current user.
+     *
+     * @param EntityManagerInterface $manager        The entity manager
+     * @param Request                $request        The HTTP request containing folder data
+     * @param FileRepository         $fileRepository The file repository
+     *
+     * @return Response JSON response with the created folder
+     */
     #[Route('/folder/create', name: 'app_file_create_folder', methods: ['POST'])]
     public function createFolder(EntityManagerInterface $manager, Request $request, FileRepository $fileRepository): Response
     {
@@ -365,6 +487,17 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Gets children files of a folder.
+     */
+    /**
+     * Gets children files of a folder.
+     *
+     * @param File           $folder         The folder entity
+     * @param FileRepository $fileRepository The file repository
+     *
+     * @return Response JSON response with children files or error
+     */
     #[Route('/folder/{id}', name: 'app_folder_get_children', methods: ['GET'])]
     public function getChildren(File $folder, FileRepository $fileRepository): Response
     {
@@ -382,6 +515,18 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Moves a file to a new parent folder.
+     */
+    /**
+     * Moves a file to a new parent folder.
+     *
+     * @param File                   $file    The file entity to move
+     * @param EntityManagerInterface $manager The entity manager
+     * @param Request                $request The HTTP request containing new parent ID
+     *
+     * @return Response JSON response with the moved file
+     */
     #[Route('/move/{id}', name: 'app_file_move', methods: ['POST'])]
     public function moveFile(File $file, EntityManagerInterface $manager, Request $request): Response
     {
@@ -401,6 +546,17 @@ class FileController extends AbstractController
         );
     }
 
+    /**
+     * Previews a file inline in the browser.
+     */
+    /**
+     * Previews a file inline in the browser.
+     *
+     * @param File           $file           The file entity to preview
+     * @param UploaderHelper $uploaderHelper The uploader helper
+     *
+     * @return Response The binary file response for preview
+     */
     #[Route('/preview/{id}', name: 'file_preview', methods: ['GET'])]
     public function previewFile(File $file, UploaderHelper $uploaderHelper): Response
     {

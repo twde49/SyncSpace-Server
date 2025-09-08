@@ -21,6 +21,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class RegistrationController extends AbstractController
 {
+    /**
+     * Handles user registration via web form.
+     *
+     * @param Request                     $request            The HTTP request
+     * @param UserPasswordHasherInterface $userPasswordHasher The password hasher
+     * @param Security                    $security           The security service
+     * @param EntityManagerInterface      $entityManager      The entity manager
+     *
+     * @return Response The rendered registration page or login response
+     */
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
     {
@@ -48,6 +58,18 @@ class RegistrationController extends AbstractController
         ]);
     }
 
+    /**
+     * Handles user registration via API.
+     *
+     * @param SerializerInterface         $serializer         The serializer
+     * @param Request                     $request            The HTTP request
+     * @param UserPasswordHasherInterface $userPasswordHasher The password hasher
+     * @param EntityManagerInterface      $manager            The entity manager
+     * @param MailerInterface             $mailer             The mailer
+     * @param MailerService               $mailerService      The mailer service
+     *
+     * @return Response JSON response with registration status
+     */
     #[Route('/api/register', methods: 'POST')]
     public function registerApi(SerializerInterface $serializer, Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $manager, MailerInterface $mailer, MailerService $mailerService): Response
     {
@@ -90,6 +112,16 @@ class RegistrationController extends AbstractController
         }
     }
 
+    /**
+     * Sends a verification code to the user's email.
+     *
+     * @param User                   $user          The user entity
+     * @param EntityManagerInterface $entityManager The entity manager
+     * @param MailerService          $mailerService The mailer service
+     * @param MailerInterface        $mailer        The mailer
+     *
+     * @return Response JSON response with verification status
+     */
     #[Route('/api/sendVerificationCode/{id}', methods: ['POST'])]
     public function sendVerificationCode(User $user, EntityManagerInterface $entityManager, MailerService $mailerService, MailerInterface $mailer): Response
     {
@@ -131,6 +163,14 @@ class RegistrationController extends AbstractController
         }
     }
 
+    /**
+     * Verifies the user's verification code.
+     *
+     * @param Request                $request       The HTTP request
+     * @param EntityManagerInterface $entityManager The entity manager
+     *
+     * @return Response JSON response with verification result
+     */
     #[Route('/api/verifyVerificationCode', methods: ['POST'])]
     public function verifyVerificationCode(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -181,6 +221,11 @@ class RegistrationController extends AbstractController
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Generates a random verification code.
+     *
+     * @return string The generated verification code
+     */
     private function generateVerificationCode(): string
     {
         return str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);

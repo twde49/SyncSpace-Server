@@ -28,18 +28,11 @@ class NoteController extends AbstractController
     }
 
     /**
-     * Retrieves a list of notes associated with the current user, sorted in ascending order.
+     * Returns a list of notes for the current user.
      *
-     * Route: GET /s (name: "index_note")
+     * @param NoteRepository $repository The repository used to fetch notes from the database
      *
-     * This method fetches notes belonging to the authenticated user from the database
-     * and returns them as a JSON response. The list is sorted in ascending order.
-     *
-     * @param NoteRepository $repository the repository used to fetch notes from the database
-     *
-     * @return Response a JSON response containing the list of notes for the current user,
-     *                  using serialization groups `note:read` and `conversation:read`,
-     *                  along with an HTTP 200 status code
+     * @return Response JSON response containing the list of notes for the current user
      */
     #[Route('s', name: 'index_note', methods: 'GET')]
     public function indexNotes(NoteRepository $repository): Response
@@ -50,6 +43,16 @@ class NoteController extends AbstractController
         return $this->json($repository->findNotesAscOrderByUser($user), Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
     }
 
+    /**
+     * Returns a list of notes shared with the current user.
+     */
+    /**
+     * Returns a list of notes shared with the current user.
+     *
+     * @param NoteRepository $repository The repository used to fetch notes from the database
+     *
+     * @return Response JSON response containing the list of shared notes
+     */
     #[Route('s/shared', name: 'shared_index_note', methods: 'GET')]
     public function indexSharedNotes(NoteRepository $repository): Response
     {
@@ -60,22 +63,14 @@ class NoteController extends AbstractController
     }
 
     /**
-     * Saves or updates a note based on the request provided.
+     * Creates or updates a note for the current user.
      *
-     * If a note object is provided as a parameter, the method updates the note
-     * with the data from the request. Otherwise, it creates a new note and associates
-     * it with the current user.
+     * @param Note|null              $note       The note to update if it exists, or null for creating a new note
+     * @param EntityManagerInterface $manager    The entity manager used to persist and manage the note
+     * @param Request                $request    The HTTP request containing the note data
+     * @param SerializerInterface    $serializer The serializer used to deserialize the note data from JSON format
      *
-     * Routes:
-     * - PUT /save/{id} (name: "update_note"): Updates an existing note with the given ID.
-     * - POST /save (name: "save_note"): Creates a new note.
-     *
-     * @param Note|null              $note       the note to update if it exists, or null for creating a new note
-     * @param EntityManagerInterface $manager    the entity manager used to persist and manage the note
-     * @param Request                $request    the HTTP request containing the note data
-     * @param SerializerInterface    $serializer the serializer used to deserialize the note data from JSON format
-     *
-     * @return Response a JSON response containing the newly created or updated note data and HTTP status code
+     * @return Response JSON response containing the newly created or updated note data
      */
     #[Route('/save/{id}', name: 'update_note', methods: ['PUT'])]
     #[Route('/save', name: 'save_note', methods: ['POST'])]
@@ -113,18 +108,12 @@ class NoteController extends AbstractController
     }
 
     /**
-     * Deletes a note based on the provided note entity.
+     * Removes a note by its ID.
      *
-     * This method removes a note from the database if it exists. If a note with the provided ID
-     * is not found, it returns a JSON response with an HTTP 404 status code.
+     * @param Note|null              $note    The note to be removed, or null if no note exists with the given ID
+     * @param EntityManagerInterface $manager The entity manager responsible for removing the note from the database
      *
-     * Route: DELETE /remove/{id} (name: "remove_note")
-     *
-     * @param Note|null              $note    the note to be removed, or null if no note exists with the given ID
-     * @param EntityManagerInterface $manager the entity manager responsible for removing the note from the database
-     *
-     * @return Response a JSON response indicating whether the note was removed successfully
-     *                  or no note was found with the given ID
+     * @return Response JSON response indicating whether the note was removed successfully or not found
      */
     #[Route('/remove/{id}', name: 'remove_note', methods: 'DELETE')]
     public function removeNote(?Note $note, EntityManagerInterface $manager): Response
@@ -138,6 +127,19 @@ class NoteController extends AbstractController
         return $this->json('Note have been deleted');
     }
 
+    /**
+     * Shares a note with specified users.
+     */
+    /**
+     * Shares a note with specified users.
+     *
+     * @param Note                   $note           The note to share
+     * @param Request                $request        The HTTP request containing user IDs
+     * @param UserRepository         $userRepository The user repository
+     * @param EntityManagerInterface $manager        The entity manager
+     *
+     * @return Response JSON response containing the shared note
+     */
     #[Route('/share/{id}', name: 'share_note', methods: 'POST')]
     public function shareNote(Note $note, Request $request, UserRepository $userRepository, EntityManagerInterface $manager): Response
     {
@@ -156,6 +158,21 @@ class NoteController extends AbstractController
         return $this->json($note, Response::HTTP_OK, [], ['groups' => ['note:read', 'conversation:read']]);
     }
 
+    /**
+     * Creates a new shared note in a conversation.
+     */
+    /**
+     * Creates a new shared note in a conversation.
+     *
+     * @param Conversation           $conversation        The conversation to associate the note with
+     * @param Request                $request             The HTTP request containing note data and user IDs
+     * @param UserRepository         $userRepository      The user repository
+     * @param EntityManagerInterface $manager             The entity manager
+     * @param SerializerInterface    $serializer          The serializer
+     * @param NotificationService    $notificationService The notification service
+     *
+     * @return Response JSON response containing the created shared note
+     */
     #[Route('/new/share/{id}', name: 'create_shared_note', methods: 'POST')]
     public function createNewSharedNote(Conversation $conversation, Request $request, UserRepository $userRepository, EntityManagerInterface $manager, SerializerInterface $serializer, NotificationService $notificationService): Response
     {

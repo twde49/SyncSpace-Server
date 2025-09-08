@@ -11,10 +11,22 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class FavoriteTrackService
 {
+    /**
+     * Constructor for FavoriteTrackService.
+     *
+     * @param EntityManagerInterface $entityManager   The entity manager
+     * @param TrackRepository        $trackRepository The track repository
+     */
     public function __construct(private readonly EntityManagerInterface $entityManager, private readonly TrackRepository $trackRepository)
     {
     }
 
+    /**
+     * Updates the user's favorite tracks by adding or removing a track.
+     *
+     * @param User   $user    The user entity
+     * @param string $trackId The YouTube ID of the track
+     */
     public function updateFavorite(User $user, string $trackId): void
     {
         $favorites = $user->getFavoriteTracks();

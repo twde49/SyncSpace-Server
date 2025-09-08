@@ -10,6 +10,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class DocController extends AbstractController
 {
+    /**
+     * Renders the documentation index page.
+     *
+     * @return Response The rendered documentation index page
+     */
     #[Route('/', name: 'app_doc', methods: ['GET'])]
     public function index(): Response
     {
